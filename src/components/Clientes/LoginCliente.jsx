@@ -26,7 +26,7 @@ export const LoginCliente = () => {
             "Content-Type": "application/json"
         }
 
-        await fetch('http://localhost:8080/clientes/login', { method: 'POST', body: body, headers: headers })
+        await fetch('http://23.23.170.196/clientes/login', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 const toastLogin = ReactSwal.mixin({

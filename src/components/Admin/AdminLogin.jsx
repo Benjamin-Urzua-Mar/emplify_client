@@ -23,7 +23,7 @@ export const AdminLogin = () => {
             "Content-Type": "application/json"
         }
 
-        await fetch('http://localhost:8080/admin/login', { method: 'POST', body: body, headers: headers })
+        await fetch('http://23.23.170.196/admin/login', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 const toastLogin = ReactSwal.mixin({
