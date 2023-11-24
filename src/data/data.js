@@ -1,0 +1,67 @@
+const columns = [
+  {name: "Usuario", uid: "usuario"},
+  {name: "Fecha registro", uid: "fecha_registro"},
+  {name: "Estado", uid: "estado"},
+  {name: "Último trabajo solicitado", uid: "trabajos_solicitados"},
+  {name: "Acciones", uid: "acciones"},
+];
+
+const users = [
+  {
+    id: 1,
+    name: "Tony Reichert",
+    team: "01-01-2023",
+    estado:"activo",
+    trabajos_solicitados: "Formateo pc",
+    content:"Profesional: Felipe Andrés - Fecha: 01-07-2023",
+    age: "29",
+    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+    email: "tony.reichert@example.com",
+  },
+  {
+    id: 2,
+    name: "Zoey Lang",
+    team: "01-01-2023",
+    estado:"activo",
+    trabajos_solicitados: "Formateo pc",
+    content:"Profesional: Felipe Andrés - Fecha: 01-07-2023",
+    age: "25",
+    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
+    email: "zoey.lang@example.com",
+  },
+  {
+    id: 3,
+    name: "Jane Fisher",
+    team: "01-01-2023",
+    estado:"baneado",
+    trabajos_solicitados: "Formateo pc",
+    content:"Profesional: Felipe Andrés - Fecha: 01-07-2023",
+    age: "22",
+    avatar: "https://i.pravatar.cc/150?u=a04258114e29026702d",
+    email: "jane.fisher@example.com",
+  },
+  {
+    id: 4,
+    name: "William Howard",
+    team: "01-01-2023",
+    estado:"activo",
+    trabajos_solicitados: "Formateo pc",
+    content:"Profesional: Felipe Andrés - Fecha: 01-07-2023",
+    age: "28",
+    avatar: "https://i.pravatar.cc/150?u=a048581f4e29026701d",
+    email: "william.howard@example.com",
+  },
+  {
+    id: 5,
+    name: "Kristen Copper",
+    team: "01-01-2023",
+    estado:"activo",
+    trabajos_solicitados: "Formateo pc",
+    content:"Profesional: Felipe Andrés - Fecha: 01-07-2023",
+    age: "24",
+    avatar: "https://i.pravatar.cc/150?u=a092581d4ef9026700d",
+    email: "kristen.cooper@example.com",
+  },
+];
+
+export {columns, users};
