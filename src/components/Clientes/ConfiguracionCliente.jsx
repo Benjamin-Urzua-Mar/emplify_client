@@ -43,7 +43,7 @@ export const ConfiguracionCliente = () => {
             "Content-Type": "application/json"
         }
 
-        await fetch(('http://localhost:8080/clientes/editarCuenta'), { method: "POST", body: body, headers: headers })
+        await fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/clientes/editarCuenta'), { method: "POST", body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 switch (msg["codigo"]) {
@@ -159,7 +159,7 @@ useEffect(() => {
     const headers = {
         "Content-Type": "application/json"
     }
-    fetch(('http://localhost:8080/clientes/getCuenta'), { method: "POST", body: body, headers: headers })
+    fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/clientes/getCuenta'), { method: "POST", body: body, headers: headers })
         .then(res => res.json().then(msg => {
             const ReactSwal = withReactContent(Swal)
             switch (msg["codigo"]) {

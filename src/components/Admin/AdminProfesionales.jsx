@@ -38,7 +38,7 @@ export const AdminProfesionales = () => {
           const headers = {
             "Content-Type": "application/json"
           }
-          fetch(('http://localhost:8080/admin/banEspecialista'), { method: "POST", body: body, headers: headers })
+          fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/banEspecialista'), { method: "POST", body: body, headers: headers })
             .then(res => res.json().then(msg => {
               setActualizarCambios(1)
               switch (msg["codigo"]) {
@@ -76,7 +76,7 @@ export const AdminProfesionales = () => {
           const headers = {
             "Content-Type": "application/json"
           }
-          fetch(('http://localhost:8080/admin/banEspecialista'), { method: "POST", body: body, headers: headers })
+          fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/banEspecialista'), { method: "POST", body: body, headers: headers })
             .then(res => res.json().then(msg => {
               setActualizarCambios(1)
               switch (msg["codigo"]) {
@@ -121,7 +121,7 @@ export const AdminProfesionales = () => {
         const headers = {
           "Content-Type": "application/json"
         }
-        fetch(('http://localhost:8080/admin/deleteEspecialista'), { method: "POST", body: body, headers: headers })
+        fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/deleteEspecialista'), { method: "POST", body: body, headers: headers })
           .then(res => res.json().then(msg => {
             setActualizarCambios(1)
             switch (msg["codigo"]) {
@@ -152,7 +152,7 @@ export const AdminProfesionales = () => {
     const headers = {
       "Content-Type": "application/json"
     }
-    fetch(('http://localhost:8080/admin/retornarEspecialista'), { method: "POST", body: body, headers: headers })
+    fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/retornarEspecialista'), { method: "POST", body: body, headers: headers })
       .then(res => res.json().then(msg => {
         const ReactSwal = withReactContent(Swal)
         switch (msg["codigo"]) {
@@ -180,7 +180,7 @@ export const AdminProfesionales = () => {
 
   const [especialistas, setEspecialistas] = useState([])
   useEffect(() => {
-    fetch(('http://localhost:8080/admin/retornarEspecialistas'))
+    fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/retornarEspecialistas'))
       .then(res => res.json().then(msg => {
         setActualizarCambios(0)
         const ReactSwal = withReactContent(Swal)
@@ -233,7 +233,7 @@ export const AdminProfesionales = () => {
       case "usuario":
         return (
           <User
-            avatarProps={{ radius: "lg", src: `http://localhost:8080/resources/images/${user.perfil.foto}` }}
+            avatarProps={{ radius: "lg", src: `https://emplify-server-dev-zcbh.4.us-1.fl0.io/resources/images/${user.perfil.foto}` }}
             description={user.email}
             name={`${user.nombres} ${user.apellidos}`}
           >

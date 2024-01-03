@@ -166,7 +166,7 @@ export const PerfilInicial = () => {
         body.append(localStorage.getItem("tempRun"), selectedFile)
         body.append("experiencia", experiencia)
 
-        await fetch('http://localhost:8080/especialistas/editarPerfil', { method: 'POST', body: body, contentType: false, processData: false, })
+        await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/especialistas/editarPerfil', { method: 'POST', body: body, contentType: false, processData: false, })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 switch (msg["codigo"]) {

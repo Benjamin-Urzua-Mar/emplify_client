@@ -247,7 +247,7 @@ export const ResultadosBusqueda = () => {
                                 <Card key={`${v4()}_${especialista._id}`} className="mt-2">
                                     <CardHeader className="justify-between">
                                         <div className="flex gap-5">
-                                            <Avatar color="secondary" isBordered radius="full" size="lg" showFallback src={`http://localhost:8080/resources/images/${especialista.perfil.foto}`} />
+                                            <Avatar color="secondary" isBordered radius="full" size="lg" showFallback src={`https://emplify-server-dev-zcbh.4.us-1.fl0.io/resources/images/${especialista.perfil.foto}`} />
                                             <div className="flex flex-col gap-1 items-start justify-center">
                                                 <h4 className="text-small font-semibold leading-none text-default-600">{`${especialista.nombres} ${especialista.apellidos}`}</h4>
                                                 <h5 className="text-small tracking-tight text-default-400">{especialista.profesion}</h5>

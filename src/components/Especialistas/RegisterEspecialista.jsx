@@ -61,7 +61,7 @@ export const RegisterEspecialista = () => {
         body.append("profesion", profesion)
         body.delete("txt_rubro")
         body.delete("txt_profesion")
-        await fetch('http://localhost:8080/especialistas/register', { method: 'POST', body: body, contentType: false, processData: false, })
+        await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/especialistas/register', { method: 'POST', body: body, contentType: false, processData: false, })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
 

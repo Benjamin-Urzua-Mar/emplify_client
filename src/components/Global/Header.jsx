@@ -13,7 +13,7 @@ export const Header = () => {
   const redirect = useNavigate()
   const logout = async () => {
     if (localStorage.getItem("tipoUsuario") == "Cliente") {
-      await fetch('http://localhost:8080/clientes/logout', { method: 'POST' })
+      await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/clientes/logout', { method: 'POST' })
         .then(res => res.json().then(msg => {
           const ReactSwal = withReactContent(Swal)
           switch (msg["codigo"]) {
@@ -40,7 +40,7 @@ export const Header = () => {
         }
         ))
     } else {
-      await fetch('http://localhost:8080/especialistas/logout', { method: 'POST' })
+      await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/especialistas/logout', { method: 'POST' })
         .then(res => res.json().then(msg => {
           const ReactSwal = withReactContent(Swal)
           switch (msg["codigo"]) {
@@ -106,7 +106,7 @@ export const Header = () => {
                       <Button
                         variant="light"
                         endContent={<FontAwesomeIcon size='xs' icon={faChevronDown}></FontAwesomeIcon>}
-                        startContent={<Avatar size='sm' showFallback color="secondary" src={`http://localhost:8080/resources/images/${localStorage.getItem("fotoPerfil")}`} />}
+                        startContent={<Avatar size='sm' showFallback color="secondary" src={`https://emplify-server-dev-zcbh.4.us-1.fl0.io/resources/images/${localStorage.getItem("fotoPerfil")}`} />}
                       >
                         {localStorage.getItem("userName")}
                       </Button>
@@ -129,7 +129,7 @@ export const Header = () => {
                       <Button
                         variant="light"
                         endContent={<FontAwesomeIcon size='xs' icon={faChevronDown}></FontAwesomeIcon>}
-                        startContent={<Avatar size='sm' showFallback  src={`http://localhost:8080/resources/images/${localStorage.getItem("fotoPerfil")}`} color="secondary"  />}
+                        startContent={<Avatar size='sm' showFallback  src={`https://emplify-server-dev-zcbh.4.us-1.fl0.io/resources/images/${localStorage.getItem("fotoPerfil")}`} color="secondary"  />}
                       >
                         {localStorage.getItem("userName")}
                       </Button>

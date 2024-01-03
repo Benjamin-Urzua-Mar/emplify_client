@@ -59,7 +59,7 @@ export const RegisterCliente = () => {
             "Content-Type": "application/json"
         }
 
-        await fetch('http://localhost:8080/clientes/register', { method: 'POST', body: body, headers: headers })
+        await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/clientes/register', { method: 'POST', body: body, headers: headers })
         .then(res => res.json().then(msg => {
             const ReactSwal = withReactContent(Swal)
          

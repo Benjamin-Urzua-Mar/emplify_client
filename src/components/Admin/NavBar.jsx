@@ -15,7 +15,7 @@ export const NavBar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const redirect = useNavigate()
     const logout = async () => {
-        await fetch('http://localhost:8080/admin/logout', { method: 'POST' })
+        await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/logout', { method: 'POST' })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 switch (msg["codigo"]) {
