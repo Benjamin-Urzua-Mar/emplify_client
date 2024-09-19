@@ -15,7 +15,7 @@ export const NavBar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const redirect = useNavigate()
     const logout = async () => {
-        await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/logout', { method: 'POST' })
+        await fetch('https://api.burzua.lat/admin/logout', { method: 'POST' })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 switch (msg["codigo"]) {

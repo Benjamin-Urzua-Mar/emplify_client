@@ -21,7 +21,7 @@ export const SolicitudesTrabajo = () => {
             "Content-Type": "application/json"
         }
 
-        fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/especialistas/getSolicitudesTrabajos', { method: 'POST', body: body, headers: headers })
+        fetch('https://api.burzua.lat/especialistas/getSolicitudesTrabajos', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
 
@@ -60,7 +60,7 @@ export const SolicitudesTrabajo = () => {
             "Content-Type": "application/json"
         }
 
-        fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/especialistas/trabajosEnCurso', { method: 'POST', body: body, headers: headers })
+        fetch('https://api.burzua.lat/especialistas/trabajosEnCurso', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 const toastReserva = ReactSwal.mixin({
@@ -107,7 +107,7 @@ export const SolicitudesTrabajo = () => {
         const headers = {
             "Content-Type": "application/json"
         }
-        fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/especialistas/trabajosTerminados', { method: 'POST', body: body, headers: headers })
+        fetch('https://api.burzua.lat/especialistas/trabajosTerminados', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 const toastReserva = ReactSwal.mixin({
@@ -179,7 +179,7 @@ export const SolicitudesTrabajo = () => {
             "Content-Type": "application/json"
         }
 
-        await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/especialistas/aceptarTrabajo', { method: 'POST', body: body, headers: headers })
+        await fetch('https://api.burzua.lat/especialistas/aceptarTrabajo', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 const toastReserva = ReactSwal.mixin({
@@ -234,7 +234,7 @@ export const SolicitudesTrabajo = () => {
             "Content-Type": "application/json"
         }
 
-        await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/especialistas/finalizarTrabajo', { method: 'POST', body: body, headers: headers })
+        await fetch('https://api.burzua.lat/especialistas/finalizarTrabajo', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 const toastReserva = ReactSwal.mixin({

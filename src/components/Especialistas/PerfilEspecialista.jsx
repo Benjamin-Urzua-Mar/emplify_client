@@ -57,7 +57,7 @@ export const PerfilEspecialista = (socket) => {
             "Content-Type": "application/json"
         }
 
-        await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/clientes/solicitarTrabajo', { method: 'POST', body: body, headers: headers })
+        await fetch('https://api.burzua.lat/clientes/solicitarTrabajo', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 const toastReserva = ReactSwal.mixin({
@@ -113,7 +113,7 @@ export const PerfilEspecialista = (socket) => {
         //estoy recibiendo el mensaje
 
         /*
-        const socket = io("https://emplify-server-dev-zcbh.4.us-1.fl0.io", {
+        const socket = io("https://api.burzua.lat", {
             auth: {
                 _id: localStorage.getItem("user_id")
             }
@@ -144,7 +144,7 @@ export const PerfilEspecialista = (socket) => {
                         <Card className="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
                             <CardHeader className="justify-between">
                                 <div className="flex gap-5">
-                                    <Avatar color="secondary" isBordered radius="sm" className="w-20 h-20 text-large" showFallback src={`https://emplify-server-dev-zcbh.4.us-1.fl0.io/resources/images/${especialista.perfil.foto}`} />
+                                    <Avatar color="secondary" isBordered radius="sm" className="w-20 h-20 text-large" showFallback src={`https://api.burzua.lat/resources/images/${especialista.perfil.foto}`} />
                                     <div className="flex flex-col gap-1 items-start justify-center">
                                         <h4 className="text-small font-semibold leading-none text-default-600">{`${especialista.nombres} ${especialista.apellidos}`}</h4>
                                         <h5 className="text-small tracking-tight text-default-400">{especialista.profesion}</h5>

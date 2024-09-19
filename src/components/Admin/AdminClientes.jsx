@@ -36,7 +36,7 @@ export const AdminClientes = () => {
           const headers = {
             "Content-Type": "application/json"
           }
-          fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/banCliente'), { method: "POST", body: body, headers: headers })
+          fetch(('https://api.burzua.lat/admin/banCliente'), { method: "POST", body: body, headers: headers })
             .then(res => res.json().then(msg => {
               setActualizarCambios(1)
               switch (msg["codigo"]) {
@@ -74,7 +74,7 @@ export const AdminClientes = () => {
           const headers = {
             "Content-Type": "application/json"
           }
-          fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/banCliente'), { method: "POST", body: body, headers: headers })
+          fetch(('https://api.burzua.lat/admin/banCliente'), { method: "POST", body: body, headers: headers })
             .then(res => res.json().then(msg => {
               setActualizarCambios(1)
               switch (msg["codigo"]) {
@@ -119,7 +119,7 @@ export const AdminClientes = () => {
         const headers = {
           "Content-Type": "application/json"
         }
-        fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/deleteCliente'), { method: "POST", body: body, headers: headers })
+        fetch(('https://api.burzua.lat/admin/deleteCliente'), { method: "POST", body: body, headers: headers })
           .then(res => res.json().then(msg => {
             setActualizarCambios(1)
             switch (msg["codigo"]) {
@@ -151,7 +151,7 @@ export const AdminClientes = () => {
     const headers = {
       "Content-Type": "application/json"
     }
-    fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/retornarCliente'), { method: "POST", body: body, headers: headers })
+    fetch(('https://api.burzua.lat/admin/retornarCliente'), { method: "POST", body: body, headers: headers })
       .then(res => res.json().then(msg => {
         const ReactSwal = withReactContent(Swal)
         switch (msg["codigo"]) {
@@ -178,7 +178,7 @@ export const AdminClientes = () => {
   }
 
   useEffect(() => {
-    fetch(('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/retornarClientes'))
+    fetch(('https://api.burzua.lat/admin/retornarClientes'))
       .then(res => res.json().then(msg => {
         setActualizarCambios(0)
         const ReactSwal = withReactContent(Swal)

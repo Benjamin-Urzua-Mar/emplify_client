@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://23.23.170.196:3000",
+        target: "https://api.burzua.lat/",
         secure: false,
       },
     },

@@ -24,7 +24,7 @@ const App = () => {
   /*
   useEffect(() => {
     if (localStorage.getItem("user_id")) {
-      const _socket = (io("https://emplify-server-dev-zcbh.4.us-1.fl0.io", {
+      const _socket = (io("https://api.burzua.lat", {
         auth: {
           _id: localStorage.getItem("user_id")
         }
@@ -51,7 +51,7 @@ const App = () => {
           <Route path="/especialistas/solicitudesTrabajo" element={<SolicitudesTrabajo />} />
           <Route path="/clientes/historialTrabajos" element={<HistorialTrabajos />} />
           <Route path="/buscar" element={<ResultadosBusqueda />} />
-          <Route path="/buscar/perfilEspecialista" element={<PerfilEspecialista socket={io("https://emplify-server-dev-zcbh.4.us-1.fl0.io", {
+          <Route path="/buscar/perfilEspecialista" element={<PerfilEspecialista socket={io("https://api.burzua.lat/", {
             auth: {
               _id: localStorage.getItem("user_id")
             }

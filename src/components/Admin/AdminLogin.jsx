@@ -23,7 +23,7 @@ export const AdminLogin = () => {
             "Content-Type": "application/json"
         }
 
-        await fetch('https://emplify-server-dev-zcbh.4.us-1.fl0.io/admin/login', { method: 'POST', body: body, headers: headers })
+        await fetch('https://api.burzua.lat/admin/login', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 const toastLogin = ReactSwal.mixin({
