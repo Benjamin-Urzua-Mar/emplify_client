@@ -166,7 +166,7 @@ export const PerfilInicial = () => {
         body.append(localStorage.getItem("tempRun"), selectedFile)
         body.append("experiencia", experiencia)
 
-        await fetch('https://api.burzua.lat/especialistas/editarPerfil', { method: 'POST', body: body, contentType: false, processData: false, })
+        await fetch('https://emplifyapi.burzuam.dpdns.org/especialistas/editarPerfil', { method: 'POST', body: body, contentType: false, processData: false, })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 switch (msg["codigo"]) {

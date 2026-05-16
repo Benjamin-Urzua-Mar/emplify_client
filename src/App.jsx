@@ -51,7 +51,7 @@ const App = () => {
           <Route path="/especialistas/solicitudesTrabajo" element={<SolicitudesTrabajo />} />
           <Route path="/clientes/historialTrabajos" element={<HistorialTrabajos />} />
           <Route path="/buscar" element={<ResultadosBusqueda />} />
-          <Route path="/buscar/perfilEspecialista" element={<PerfilEspecialista socket={io("https://api.burzua.lat/", {
+          <Route path="/buscar/perfilEspecialista" element={<PerfilEspecialista socket={io("https://emplifyapi.burzuam.dpdns.org", {
             auth: {
               _id: localStorage.getItem("user_id")
             }

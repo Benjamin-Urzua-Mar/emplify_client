@@ -38,7 +38,7 @@ export const AdminProfesionales = () => {
           const headers = {
             "Content-Type": "application/json"
           }
-          fetch(('https://api.burzua.lat/admin/banEspecialista'), { method: "POST", body: body, headers: headers })
+          fetch(('https://emplifyapi.burzuam.dpdns.org/admin/banEspecialista'), { method: "POST", body: body, headers: headers })
             .then(res => res.json().then(msg => {
               setActualizarCambios(1)
               switch (msg["codigo"]) {
@@ -76,7 +76,7 @@ export const AdminProfesionales = () => {
           const headers = {
             "Content-Type": "application/json"
           }
-          fetch(('https://api.burzua.lat/admin/banEspecialista'), { method: "POST", body: body, headers: headers })
+          fetch(('https://emplifyapi.burzuam.dpdns.org/admin/banEspecialista'), { method: "POST", body: body, headers: headers })
             .then(res => res.json().then(msg => {
               setActualizarCambios(1)
               switch (msg["codigo"]) {
@@ -121,7 +121,7 @@ export const AdminProfesionales = () => {
         const headers = {
           "Content-Type": "application/json"
         }
-        fetch(('https://api.burzua.lat/admin/deleteEspecialista'), { method: "POST", body: body, headers: headers })
+        fetch(('https://emplifyapi.burzuam.dpdns.org/admin/deleteEspecialista'), { method: "POST", body: body, headers: headers })
           .then(res => res.json().then(msg => {
             setActualizarCambios(1)
             switch (msg["codigo"]) {
@@ -152,7 +152,7 @@ export const AdminProfesionales = () => {
     const headers = {
       "Content-Type": "application/json"
     }
-    fetch(('https://api.burzua.lat/admin/retornarEspecialista'), { method: "POST", body: body, headers: headers })
+    fetch(('https://emplifyapi.burzuam.dpdns.org/admin/retornarEspecialista'), { method: "POST", body: body, headers: headers })
       .then(res => res.json().then(msg => {
         const ReactSwal = withReactContent(Swal)
         switch (msg["codigo"]) {
@@ -180,7 +180,7 @@ export const AdminProfesionales = () => {
 
   const [especialistas, setEspecialistas] = useState([])
   useEffect(() => {
-    fetch(('https://api.burzua.lat/admin/retornarEspecialistas'))
+    fetch(('https://emplifyapi.burzuam.dpdns.org/admin/retornarEspecialistas'))
       .then(res => res.json().then(msg => {
         setActualizarCambios(0)
         const ReactSwal = withReactContent(Swal)
@@ -233,7 +233,7 @@ export const AdminProfesionales = () => {
       case "usuario":
         return (
           <User
-            avatarProps={{ radius: "lg", src: `https://api.burzua.lat/resources/images/${user.perfil.foto}` }}
+            avatarProps={{ radius: "lg", src: `https://emplifyapi.burzuam.dpdns.org/resources/images/${user.perfil.foto}` }}
             description={user.email}
             name={`${user.nombres} ${user.apellidos}`}
           >

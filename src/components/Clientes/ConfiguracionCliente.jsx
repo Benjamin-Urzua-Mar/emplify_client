@@ -43,7 +43,7 @@ export const ConfiguracionCliente = () => {
             "Content-Type": "application/json"
         }
 
-        await fetch(('https://api.burzua.lat/clientes/editarCuenta'), { method: "POST", body: body, headers: headers })
+        await fetch(('https://emplifyapi.burzuam.dpdns.org/clientes/editarCuenta'), { method: "POST", body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 switch (msg["codigo"]) {
@@ -159,7 +159,7 @@ useEffect(() => {
     const headers = {
         "Content-Type": "application/json"
     }
-    fetch(('https://api.burzua.lat/clientes/getCuenta'), { method: "POST", body: body, headers: headers })
+    fetch(('https://emplifyapi.burzuam.dpdns.org/clientes/getCuenta'), { method: "POST", body: body, headers: headers })
         .then(res => res.json().then(msg => {
             const ReactSwal = withReactContent(Swal)
             switch (msg["codigo"]) {

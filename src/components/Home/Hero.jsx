@@ -28,7 +28,7 @@ export const Hero = () => {
       "Content-Type": "application/json"
     }
 
-    await fetch('https://api.burzua.lat/buscar', { method: 'POST', body: body, headers: headers })
+    await fetch('https://emplifyapi.burzuam.dpdns.org/buscar', { method: 'POST', body: body, headers: headers })
       .then(res => res.json().then(msg => {
         const ReactSwal = withReactContent(Swal)
         const redirectParameters = () => {

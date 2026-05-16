@@ -26,7 +26,7 @@ export const LoginCliente = () => {
             "Content-Type": "application/json"
         }
 
-        await fetch('https://api.burzua.lat/clientes/login', { method: 'POST', body: body, headers: headers })
+        await fetch('https://emplifyapi.burzuam.dpdns.org/clientes/login', { method: 'POST', body: body, headers: headers })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
                 const toastLogin = ReactSwal.mixin({

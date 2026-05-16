@@ -61,7 +61,7 @@ export const RegisterEspecialista = () => {
         body.append("profesion", profesion)
         body.delete("txt_rubro")
         body.delete("txt_profesion")
-        await fetch('https://api.burzua.lat/especialistas/register', { method: 'POST', body: body, contentType: false, processData: false, })
+        await fetch('https://emplifyapi.burzuam.dpdns.org/especialistas/register', { method: 'POST', body: body, contentType: false, processData: false, })
             .then(res => res.json().then(msg => {
                 const ReactSwal = withReactContent(Swal)
 
