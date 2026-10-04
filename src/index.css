@@ -1,3 +1,101 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ------------------------------------------------------------------
+ * Estilos base de Emplify. Ver docs/GUIA_DE_ESTILOS.md
+ * ------------------------------------------------------------------ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface font-sans text-ink-body antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+  }
+
+  /* NextUI gestiona su propio anillo de foco; esto cubre enlaces y controles nativos */
+  a:focus-visible,
+  select:focus-visible,
+  input[type="file"]:focus-visible + * {
+    @apply rounded-md outline-none ring-2 ring-brand-500 ring-offset-2;
+  }
+}
+
+@layer components {
+  /* Contenedor estándar de página */
+  .page-container {
+    @apply mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Enlace de texto de marca */
+  .link {
+    @apply font-medium text-brand-500 underline-offset-4 transition-colors hover:text-brand-600 hover:underline;
+  }
+
+  /* Tarjeta base (contenedor blanco con sombra suave) */
+  .card {
+    @apply rounded-2xl border border-default-100 bg-white shadow-card;
+  }
+}
+
+/* ------------------------------------------------------------------
+ * SweetAlert2 alineado al design system
+ * ------------------------------------------------------------------ */
+.swal2-popup {
+  font-family: Roboto, ui-sans-serif, system-ui, sans-serif;
+  border-radius: 1rem !important;
+}
+
+.swal2-title {
+  font-family: Poppins, Roboto, ui-sans-serif, system-ui, sans-serif;
+  color: #1f1f24 !important;
+  font-size: 1.5rem !important;
+}
+
+.swal2-html-container {
+  color: #444444 !important;
+}
+
+.swal2-styled {
+  border-radius: 0.75rem !important;
+  font-weight: 500 !important;
+  padding: 0.625rem 1.25rem !important;
+}
+
+.swal2-styled.swal2-confirm {
+  background-color: #890bff !important;
+}
+
+.swal2-styled.swal2-confirm:hover {
+  background-color: #7715d3 !important;
+}
+
+.swal2-styled.swal2-cancel,
+.swal2-styled.swal2-deny {
+  background-color: #f4f4f5 !important;
+  color: #3f3f46 !important;
+}
+
+.swal2-styled:focus {
+  box-shadow: 0 0 0 3px rgba(137, 11, 255, 0.35) !important;
+}
+
+.swal2-input:focus {
+  border-color: #890bff !important;
+  box-shadow: 0 0 0 3px rgba(137, 11, 255, 0.2) !important;
+}
+
+.swal2-footer a {
+  color: #890bff;
+  font-weight: 500;
+}
+
+.swal2-timer-progress-bar {
+  background: #890bff !important;
+}

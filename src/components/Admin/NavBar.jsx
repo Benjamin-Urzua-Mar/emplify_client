@@ -1,176 +1,84 @@
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem } from "@nextui-org/react"
-import { Link, useNavigate } from "react-router-dom"
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, Button } from "@nextui-org/react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons"
+import { useNavigate } from "react-router-dom"
 import { useGlobalState, setGlobalState } from "../../../global_states"
 import { useState } from "react"
-import Swal from "sweetalert2"
-import withReactContent from "sweetalert2-react-content"
+import { Logo } from "../ui/Logo"
+import { alertError, alertNetworkError, toast } from "../../lib/alerts"
+
+const secciones = [
+    { key: "cliente", label: "Clientes" },
+    { key: "profesionales", label: "Profesionales" },
+    { key: "reportes", label: "Reportes" },
+    { key: "solicitudes", label: "Solicitudes" },
+]
 
 export const NavBar = () => {
     const [vista] = useGlobalState("vistaAdmin")
-    const handleVista = (e, v) => {
-        e.preventDefault()
-        setGlobalState("vistaAdmin", v)// vistaAdmin:"cliente"        vistaAdmin:"profesionales"
-    }
-
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const redirect = useNavigate()
-    const logout = async () => {
-        await fetch('https://emplifyapi.burzuam.dpdns.org/admin/logout', { method: 'POST' })
-            .then(res => res.json().then(msg => {
-                const ReactSwal = withReactContent(Swal)
-                switch (msg["codigo"]) {
-                    case 1:
-                        ReactSwal.fire({
-                            icon: 'success',
-                            title: '¡Genial!',
-                            text: msg["msg"],
-                        }).then((result) => {
-                            if (result['isConfirmed']) {
-                                redirect("/")
-                            }
-                        })
-                        break;
-                    case 10:
-                        ReactSwal.fire({
-                            icon: 'error',
-                            title: 'Problemas...',
-                            text: msg["msg"],
-                        })
-                        break;
-                }
-            }
-            ))
+
+    const handleVista = (v) => {
+        setGlobalState("vistaAdmin", v)
+        setIsMenuOpen(false)
     }
 
-    return (
-        <Navbar position="static" onMenuOpenChange={setIsMenuOpen}>
+    const logout = async () => {
+        try {
+            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/admin/logout', { method: 'POST' })
+            const msg = await res.json()
+            switch (msg["codigo"]) {
+                case 1:
+                    sessionStorage.clear()
+                    setGlobalState("vistaAdmin", "inicial")
+                    redirect("/")
+                    toast.fire({ icon: 'success', title: msg["msg"] || "Sesión cerrada" })
+                    break;
+                case 10:
+                    alertError(msg["msg"])
+                    break;
+            }
+        } catch {
+            alertNetworkError()
+        }
+    }
 
+    const claseLink = (activo) => `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${activo ? "bg-brand-50 text-brand-600" : "text-ink-body hover:bg-default-100 hover:text-ink"}`
+
+    return (
+        <Navbar isBordered maxWidth="xl" isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen} classNames={{ wrapper: "px-4 sm:px-6 lg:px-8" }}>
             <NavbarContent>
-                <NavbarMenuToggle
-                    aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-                    className="sm:hidden"
-                />
+                <NavbarMenuToggle aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"} className="md:hidden" />
                 <NavbarBrand>
-                    <Link to="/"><span className="font-['Poppins', sans-serif] font-[650] text-[32px]">Empl<span className="text-Primary">ify<small className="text-Primary text-sm ">Admin</small></span></span></Link>
+                    <Logo suffix="Admin" to={null} />
                 </NavbarBrand>
             </NavbarContent>
-            <NavbarContent className="hidden sm:flex gap-4" justify="center">
-                <NavbarItem>
-                    {
-                        (vista == "cliente")
-                            ?
-                            <Link className="text-Primary" onClick={(e) => handleVista(e, "cliente")}>
-                                Clientes
-                            </Link>
-                            :
-                            <Link className="text-default-500 hover:text-Primary hover:underline" onClick={(e) => handleVista(e, "cliente")}>
-                                Clientes
-                            </Link>
-                    }
-
-                </NavbarItem>
-                <NavbarItem>
-                    {
-                        (vista == "profesionales")
-                            ?
-
-                            <Link className="text-Primary" onClick={(e) => handleVista(e, "profesionales")} to="#" aria-current="page">
-                                Profesionales
-                            </Link>
-                            :
-                            <Link className="text-default-500 hover:text-Primary hover:underline" onClick={(e) => handleVista(e, "profesionales")} to="#" aria-current="page">
-                                Profesionales
-                            </Link>
-                    }
-                </NavbarItem>
-                <NavbarItem>
-
-                    {
-                        (vista  == "reportes")
-                            ?
-
-                            <Link className="text-Primary" onClick={(e) => handleVista(e, "reportes")} to="#">
-                                Reportes
-                            </Link>
-                            :
-                            <Link className="text-default-500 hover:text-Primary hover:underline" onClick={(e) => handleVista(e, "reportes")} to="#">
-                                Reportes
-                            </Link>
-                    }
-                </NavbarItem>
-
-                <NavbarItem>
-
-                    {
-                        (vista == "solicitudes")
-                            ?
-
-                            <Link className="text-Primary" onClick={(e) => handleVista(e, "solicitudes")} to="#">
-                                Solicitudes
-                            </Link>
-                            :
-                            <Link className="text-default-500 hover:text-Primary hover:underline" onClick={(e) => handleVista(e, "solicitudes")} to="#">
-                                Solicitudes
-                            </Link>
-                    }
-                </NavbarItem>
+            <NavbarContent className="hidden gap-1 md:flex" justify="center">
+                {secciones.map(s => (
+                    <NavbarItem key={s.key} isActive={vista == s.key}>
+                        <button type="button" className={claseLink(vista == s.key)} aria-current={vista == s.key ? "page" : undefined} onClick={() => handleVista(s.key)}>
+                            {s.label}
+                        </button>
+                    </NavbarItem>
+                ))}
             </NavbarContent>
             <NavbarContent justify="end">
-                <NavbarItem className="hidden lg:flex">
-                    <Link  onClick={() => logout()}>Cerrar sesion</Link>
+                <NavbarItem>
+                    <Button variant="light" color="danger" onPress={logout} startContent={<FontAwesomeIcon icon={faRightFromBracket} />} className="hidden sm:flex">Cerrar sesión</Button>
                 </NavbarItem>
             </NavbarContent>
 
-            <NavbarMenu>
+            <NavbarMenu className="gap-1 pt-4">
+                {secciones.map(s => (
+                    <NavbarMenuItem key={s.key} isActive={vista == s.key}>
+                        <button type="button" className={`w-full text-left text-lg ${claseLink(vista == s.key)}`} onClick={() => handleVista(s.key)}>{s.label}</button>
+                    </NavbarMenuItem>
+                ))}
                 <NavbarMenuItem>
-                    {
-                        (vista == "cliente")
-                            ?
-                            <Link className="text-Primary" onClick={(e) => handleVista(e, "cliente")}>
-                                Clientes
-                            </Link>
-                            :
-                            <Link className="text-default-500 hover:text-Primary" onClick={(e) => handleVista(e, "cliente")}>
-                                Clientes
-                            </Link>
-                    }
-
-                </NavbarMenuItem>
-
-                <NavbarMenuItem>
-                    {
-                        (vista == "profesionales")
-                            ?
-
-                            <Link className="text-Primary" onClick={(e) => handleVista(e, "profesionales")} to="#" aria-current="page">
-                                Profesionales
-                            </Link>
-                            :
-                            <Link className="text-default-500 hover:text-Primary" onClick={(e) => handleVista(e, "profesionales")} to="#" aria-current="page">
-                                Profesionales
-                            </Link>
-                    }
-                </NavbarMenuItem>
-
-                <NavbarMenuItem>
-
-                    {
-                        (vista !== "profesionales" && vista !== "cliente")
-                            ?
-
-                            <Link className="text-Primary" onClick={(e) => handleVista(e, "reportes")} to="#">
-                                Reportes
-                            </Link>
-                            :
-                            <Link className="text-default-500 hover:text-Primary" onClick={(e) => handleVista(e, "reportes")} to="#">
-                                Reportes
-                            </Link>
-                    }
-                </NavbarMenuItem>
-
-                <NavbarMenuItem>
-
-                    <Link to="/">Cerrar sesion</Link>
+                    <button type="button" className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-lg text-danger hover:bg-danger-50" onClick={logout}>
+                        <FontAwesomeIcon icon={faRightFromBracket} />Cerrar sesión
+                    </button>
                 </NavbarMenuItem>
             </NavbarMenu>
         </Navbar>

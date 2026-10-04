@@ -1,104 +1,56 @@
 import { Input, Button } from "@nextui-org/react"
-import { useRef } from "react"
-import Swal from "sweetalert2"
-import withReactContent from "sweetalert2-react-content"
+import { useState } from "react"
 import { setGlobalState } from "../../../global_states/index"
+import { Logo } from "../ui/Logo"
+import { PasswordInput } from "../ui/PasswordInput"
+import { alertError, alertNetworkError, toast } from "../../lib/alerts"
 
 export const AdminLogin = () => {
-    const txt_user = useRef()
-    const txt_contrasena = useRef()
+    const [user, setUser] = useState("")
+    const [contrasena, setContrasena] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
 
     const loginAdmin = async (e) => {
         e.preventDefault()
-        const user = txt_user.current.value
-        const contrasena = txt_contrasena.current.value
-
-        const body = JSON.stringify(
-            {
-                user: user,
-                contrasena: contrasena
+        setIsLoading(true)
+        try {
+            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/admin/login', {
+                method: 'POST',
+                body: JSON.stringify({ user, contrasena }),
+                headers: { "Content-Type": "application/json" }
+            })
+            const msg = await res.json()
+            switch (msg["codigo"]) {
+                case 1:
+                    sessionStorage.setItem("user_id", msg['sessionId'])
+                    sessionStorage.setItem("tipoUsuario", msg['tipoUsuario'])
+                    setGlobalState("vistaAdmin", "cliente")
+                    toast.fire({ icon: 'success', title: `Bienvenido, ${msg['tipoUsuario']}` })
+                    break;
+                case 2:
+                case 3:
+                case 10:
+                    alertError(msg["msg"])
+                    break;
             }
-        )
-        const headers = {
-            "Content-Type": "application/json"
+        } catch {
+            alertNetworkError()
+        } finally {
+            setIsLoading(false)
         }
-
-        await fetch('https://emplifyapi.burzuam.dpdns.org/admin/login', { method: 'POST', body: body, headers: headers })
-            .then(res => res.json().then(msg => {
-                const ReactSwal = withReactContent(Swal)
-                const toastLogin = ReactSwal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                })
-
-                switch (msg["codigo"]) {
-                    case 1:
-                        ReactSwal.fire({
-                            icon: 'success',
-                            title: '¡Genial!',
-                            text: msg["msg"],
-                        }).then((result) => {
-                            if (result['isConfirmed']) {
-                                sessionStorage.setItem("user_id", msg['sessionId'])
-                                sessionStorage.setItem("tipoUsuario", msg['tipoUsuario'])
-                                setGlobalState("vistaAdmin", "cliente")
-                                toastLogin.fire({
-                                    icon: 'success',
-                                    title: `Bienvenido ${sessionStorage.getItem("tipoUsuario")}`
-                                })
-
-                            }
-                        })
-                        break;
-                    case 2:
-                        ReactSwal.fire({
-                            icon: 'error',
-                            title: 'Problemas...',
-                            text: msg["msg"],
-                            footer: '<a href="/">Recuperar contraseña</a>'
-                        })
-                        break;
-                    case 3:
-                        ReactSwal.fire({
-                            icon: 'error',
-                            title: 'Problemas...',
-                            text: msg["msg"],
-                            footer: '<a href="/">Reestablecer cuenta</a>'
-                        })
-                        break;
-                    case 10:
-                        ReactSwal.fire({
-                            icon: 'error',
-                            title: 'Problemas...',
-                            text: msg["msg"],
-                        })
-                        break;
-
-                }
-            }))
     }
 
     return (
-        <form className="container p-16 sm:py-28 sm:px-96 m-auto" onSubmit={(e) => loginAdmin(e)}>
-            <p className="text-default-500 mb-4">Iniciar sesión como administrador</p>
-            <Input type="text" placeholder="Usuario" color="secondary" variant="underlined" name="txt_username" id="txt_username" ref={txt_user} />
-            <Input
-                variant="underlined"
-                type="password"
-                placeholder="Contraseña"
-                color="secondary"
-                name="txt_contrasena"
-                id="txt_contrasena"
-                ref={txt_contrasena}
-            />
-            <Button color="secondary" type="submit" className="mt-3">Iniciar sesión</Button>
-        </form>
+        <div className="flex min-h-screen items-center justify-center bg-surface-muted px-4">
+            <form className="card flex w-full max-w-sm flex-col gap-5 p-8" onSubmit={loginAdmin}>
+                <div className="text-center">
+                    <Logo suffix="Admin" />
+                    <p className="mt-2 text-sm text-ink-muted">Inicia sesión como administrador</p>
+                </div>
+                <Input isRequired label="Usuario" labelPlacement="outside" placeholder="Usuario" variant="bordered" autoComplete="username" value={user} onValueChange={setUser} />
+                <PasswordInput isRequired label="Contraseña" labelPlacement="outside" placeholder="Contraseña" variant="bordered" value={contrasena} onValueChange={setContrasena} />
+                <Button color="primary" type="submit" size="lg" isLoading={isLoading}>Iniciar sesión</Button>
+            </form>
+        </div>
     )
 }

@@ -1,7 +1,13 @@
-import { Header } from '../Global/Header'
-import { Footer } from '../Global/Footer'
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue } from "@nextui-org/react"
-import { useEffect, useState } from 'react'
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip } from "@nextui-org/react"
+import { AccountLayout } from '../ui/AccountLayout'
+import { PageHeader } from '../ui/PageHeader'
+import { navCliente } from '../../data/navegacion'
+
+const colorEstado = {
+    "Activo": "primary",
+    "Terminado": "success",
+    "Cancelado": "danger",
+}
 
 export const HistorialTrabajos = () => {
 
@@ -13,7 +19,7 @@ export const HistorialTrabajos = () => {
             "especialista": "Felipe Arriagada Perez",
             "fechaInicio": "01-07-2022",
             "fechaFin": "18-07-2022",
-            "descripcionTrabajo": "Se realizo una página web con tal, tal y tal",
+            "descripcionTrabajo": "Se realizó una página web con tal, tal y tal",
             "tipoServicio": "Desarrollo web"
         },
         {
@@ -23,75 +29,48 @@ export const HistorialTrabajos = () => {
             "especialista": "Francisco Martinez Ortiz",
             "fechaInicio": "01-07-2022",
             "fechaFin": "18-07-2022",
-            "descripcionTrabajo": "Se realizo una app movil con tal, tal y tal",
-            "tipoServicio": "Desarrollo movil"
+            "descripcionTrabajo": "Se realizó una app móvil con tal, tal y tal",
+            "tipoServicio": "Desarrollo móvil"
         }
     ]
 
     const columnas = [
-        {
-            "key": "estadoTrabajo",
-            "label": "Estado del trabajo"
-        },
-        {
-            "key": "cliente",
-            "label": "Cliente"
-        },
-        {
-            "key": "especialista",
-            "label": "Especialista"
-        },
-        {
-            "key": "fechaInicio",
-            "label": "Fecha de inicio"
-        },
-        {
-            "key": "fechaFin",
-            "label": "Fecha de finalización"
-        },
-        {
-            "key": "descripcionTrabajo",
-            "label": "Descripción del trabajo"
-        },
-        {
-            "key": "tipoServicio",
-            "label": "Servicio"
-        }
+        { "key": "tipoServicio", "label": "Servicio" },
+        { "key": "especialista", "label": "Especialista" },
+        { "key": "estadoTrabajo", "label": "Estado" },
+        { "key": "fechaInicio", "label": "Inicio" },
+        { "key": "fechaFin", "label": "Término" },
+        { "key": "descripcionTrabajo", "label": "Descripción" },
     ]
 
-    //const [trabajos, setTrabajos] = useState({})
+    const renderCelda = (trabajo, key) => {
+        switch (key) {
+            case "estadoTrabajo":
+                return <Chip size="sm" variant="flat" color={colorEstado[trabajo.estadoTrabajo] ?? "default"}>{trabajo.estadoTrabajo}</Chip>
+            case "tipoServicio":
+                return <span className="font-medium text-ink">{trabajo.tipoServicio}</span>
+            case "descripcionTrabajo":
+                return <span className="line-clamp-2 min-w-[12rem] text-ink-muted">{trabajo.descripcionTrabajo}</span>
+            default:
+                return <span className="whitespace-nowrap">{trabajo[key]}</span>
+        }
+    }
 
-    /*
-    useEffect(() => {
-        fetch("/public/trabajo.json").then(
-            response => response.json()
-        ).then(
-            data => {
-                setTrabajos(data)
-            }
-        )
-    })
-    */
     return (
-        <>
-            <Header />
-            <div className="container m-auto static pb-20 pt-10 px-[100px]">
-                <h1 className="text-[1.5rem] font-[500] mb-3">Historial:</h1>
-
-                <Table>
-                    <TableHeader columns={columnas}>
-                        {(columna) => <TableColumn key={columna.key}>{columna.label}</TableColumn>}
-                    </TableHeader>
-                    <TableBody items={trabajos}>
-                        {(trabajo) => (
-                            <TableRow key={trabajo.key}>
-                                {(keyColumna) => <TableCell>{getKeyValue(trabajo, keyColumna)}</TableCell>}
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-            <Footer />
-        </>
+        <AccountLayout navTitle="Mi cuenta" nav={navCliente}>
+            <PageHeader title="Historial de trabajos" description="Revisa los servicios que has contratado." />
+            <Table aria-label="Historial de trabajos" classNames={{ wrapper: "shadow-card" }}>
+                <TableHeader columns={columnas}>
+                    {(columna) => <TableColumn key={columna.key}>{columna.label}</TableColumn>}
+                </TableHeader>
+                <TableBody items={trabajos} emptyContent="Aún no has contratado servicios.">
+                    {(trabajo) => (
+                        <TableRow key={trabajo.key}>
+                            {(keyColumna) => <TableCell>{renderCelda(trabajo, keyColumna)}</TableCell>}
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </AccountLayout>
     )
 }

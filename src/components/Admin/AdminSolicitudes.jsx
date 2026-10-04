@@ -1,80 +1,69 @@
-import { Card, CardHeader, CardBody, CardFooter, Divider, Button, Image, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Checkbox, Input } from "@nextui-org/react";
+import { Button, Avatar, Select, SelectItem, Chip } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { faFileLines } from "@fortawesome/free-solid-svg-icons";
 import { useMemo, useState } from "react";
+import { PageHeader } from "../ui/PageHeader";
+import { formatFecha } from "../../lib/format";
+
+// Datos de demostración hasta que exista el endpoint de solicitudes de registro
+const solicitudesDemo = [
+    { id: 1, nombre: "Pedrito Sánchez", email: "email@ejemplo.com", profesional: "Zoey Lang", fecha: "2023-09-21" },
+]
+
+const documentos = ["Cédula de identidad", "Certificado de antecedentes", "Certificado de residencia"]
 
 export const AdminSolicitudes = () => {
-    const [ordenes, setOrdenes] = useState(new Set(["Fecha"]));
+    const [orden, setOrden] = useState("recientes")
 
-    const orden = useMemo(
-        () => Array.from(ordenes).join(", "),
-        [ordenes]
-    );
+    const solicitudes = useMemo(() => [...solicitudesDemo].sort((a, b) =>
+        orden == "recientes" ? b.fecha.localeCompare(a.fecha) : a.fecha.localeCompare(b.fecha)
+    ), [orden])
 
     return (
-        <main className="container  mx-auto gap-4">
-            <section className="flex py-4">
-                <span>
-                    <Dropdown>
-                        <DropdownTrigger>
-                            <Input
-                                value={orden}
-                                variant="underlined"
-                                label="Ordenar por:"
-                                labelPlacement="outside-left"
-                                endContent={<FontAwesomeIcon size="xs" icon={faChevronDown} />}
-                                type="text"
-                            />
-                        </DropdownTrigger>
-                        <DropdownMenu aria-label="Static Actions"
-                            disallowEmptySelection
-                            selectionMode="single"
-                            selectedKeys={ordenes}
-                            onSelectionChange={setOrdenes}
-                        >
-                            <DropdownItem key="Fecha">Fecha</DropdownItem>
-                            <DropdownItem key="Prioridad">Prioridad</DropdownItem>
-                            <DropdownItem key="Estado">Estado</DropdownItem>
-                        </DropdownMenu>
-                    </Dropdown>
-                </span>
-                <span>
-                    <Checkbox size="sm" className="pt-4 ml-4" color="secondary">Mostrar resueltos</Checkbox>
-                </span>
+        <main className="page-container py-8">
+            <PageHeader title="Solicitudes de registro" description="Revisa la documentación de los especialistas antes de aprobar su cuenta." />
+            <section className="card mb-4 flex flex-wrap items-center gap-4 p-4">
+                <Select label="Ordenar por" size="sm" variant="bordered" disallowEmptySelection selectedKeys={[orden]} onSelectionChange={k => setOrden(Array.from(k)[0])} className="max-w-[12rem]">
+                    <SelectItem key="recientes" value="recientes">Más recientes</SelectItem>
+                    <SelectItem key="antiguas" value="antiguas">Más antiguas</SelectItem>
+                </Select>
             </section>
-            <Card className="mb-3">
-                <CardHeader className="flex gap-3">
-                    <Image
-                        alt="nextui logo"
-                        height={40}
-                        radius="sm"
-                        src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
-                        width={40}
-                    />
-                    <div className="flex flex-col">
-                        <p className="text-md">Pedrito Sánchez</p>
-                        <p className="text-small text-default-500">email@ejemplo.com</p>
-                    </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                    <h5 className="font-semibold text-xl">Solicitud de registro</h5>
-                    <p className="text-default-600">Profesional: <b>Zoey Lang</b></p>
-                    <p className="text-default-600">Fecha de solicitud: <b>21-09-2023</b></p>
 
-                    <p className="text-default-600">Revisar:
-                        <span className="text-Primary hover:underline hover:cursor-pointer font-semibold"> Cédula de identidad </span>
-                        <span className="text-Primary hover:underline hover:cursor-pointer font-semibold"> Certificado de antecedentes </span>
-                        <span className="text-Primary hover:underline hover:cursor-pointer font-semibold"> Certificado de residencia </span>
-                    </p>
-                </CardBody>
-                <Divider />
-                <CardFooter className="justify-end gap-3">
-                    <Button color="danger">Rechazar</Button>
-                    <Button color="secondary">Aprobar</Button>
-                </CardFooter>
-            </Card>
-
+            <div className="flex flex-col gap-4">
+                {solicitudes.map(s => (
+                    <article key={s.id} className="card overflow-hidden">
+                        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-default-100 px-5 py-4">
+                            <div className="flex items-center gap-3">
+                                <Avatar name={s.nombre} showFallback radius="lg" />
+                                <div>
+                                    <p className="font-medium text-ink">{s.nombre}</p>
+                                    <p className="text-sm text-ink-muted">{s.email}</p>
+                                </div>
+                            </div>
+                            <Chip size="sm" variant="flat" color="warning">Pendiente</Chip>
+                        </header>
+                        <div className="flex flex-col gap-3 px-5 py-4">
+                            <h3 className="text-lg font-semibold">Solicitud de registro</h3>
+                            <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                                <div><dt className="inline text-ink-muted">Profesional: </dt><dd className="inline font-medium text-ink">{s.profesional}</dd></div>
+                                <div><dt className="inline text-ink-muted">Fecha de solicitud: </dt><dd className="inline font-medium text-ink">{formatFecha(s.fecha)}</dd></div>
+                            </dl>
+                            <div>
+                                <p className="mb-2 text-sm text-ink-muted">Documentos para revisar:</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {documentos.map(doc => (
+                                        <Button key={doc} size="sm" variant="flat" color="primary" startContent={<FontAwesomeIcon icon={faFileLines} />}>{doc}</Button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <footer className="flex justify-end gap-2 border-t border-default-100 bg-surface-muted px-5 py-3">
+                            <Button color="danger" variant="light">Rechazar</Button>
+                            <Button color="primary">Aprobar</Button>
+                        </footer>
+                    </article>
+                ))}
+            </div>
         </main>
     )
 }
