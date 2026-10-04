@@ -1,207 +1,140 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
-import { DropdownHeader } from '../Flowbite/DropdownHeader'
-import { Navbar, Avatar, NavbarBrand, NavbarContent, DropdownMenu, DropdownItem, Dropdown, DropdownTrigger, NavbarItem, Button, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, Accordion, AccordionItem, Listbox, ListboxItem } from "@nextui-org/react";
+import { faChevronDown, faRightFromBracket, faUser, faClockRotateLeft, faBriefcase, faIdCard } from '@fortawesome/free-solid-svg-icons'
+import { Navbar, Avatar, NavbarBrand, NavbarContent, DropdownMenu, DropdownItem, Dropdown, DropdownTrigger, NavbarItem, Button, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, DropdownSection } from "@nextui-org/react";
 import { Topbar } from './Topbar'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Logo } from '../ui/Logo';
+import { getSession, logout } from '../../lib/session';
+import { imageUrl } from '../../lib/format';
+
+const menuPorTipo = {
+  Cliente: [
+    { key: "cuenta", label: "Mi cuenta", to: "/clientes/cuenta", icon: faUser },
+    { key: "historial", label: "Historial de trabajos", to: "/clientes/historialTrabajos", icon: faClockRotateLeft },
+  ],
+  Especialista: [
+    { key: "perfil", label: "Editar perfil", to: "/especialistas/cuenta", icon: faIdCard },
+    { key: "solicitudes", label: "Solicitudes de trabajo", to: "/especialistas/solicitudesTrabajo", icon: faBriefcase },
+  ],
+}
+
+const accesoInvitado = [
+  { titulo: "Iniciar sesión", cliente: "/clientes/login", especialista: "/especialistas/login" },
+  { titulo: "Registrarse", cliente: "/clientes/register", especialista: "/especialistas/register" },
+]
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const redirect = useNavigate()
-  const logout = async () => {
-    if (localStorage.getItem("tipoUsuario") == "Cliente") {
-      await fetch('https://emplifyapi.burzuam.dpdns.org/clientes/logout', { method: 'POST' })
-        .then(res => res.json().then(msg => {
-          const ReactSwal = withReactContent(Swal)
-          switch (msg["codigo"]) {
-            case 1:
-              ReactSwal.fire({
-                icon: 'success',
-                title: '¡Genial!',
-                text: msg["msg"],
-              }).then((result) => {
-                if (result['isConfirmed']) {
-                  localStorage.clear()
-                  redirect("/")
-                }
-              })
-              break;
-            case 10:
-              ReactSwal.fire({
-                icon: 'error',
-                title: 'Problemas...',
-                text: msg["msg"],
-              })
-              break;
-          }
-        }
-        ))
-    } else {
-      await fetch('https://emplifyapi.burzuam.dpdns.org/especialistas/logout', { method: 'POST' })
-        .then(res => res.json().then(msg => {
-          const ReactSwal = withReactContent(Swal)
-          switch (msg["codigo"]) {
-            case 1:
-              ReactSwal.fire({
-                icon: 'success',
-                title: '¡Genial!',
-                text: msg["msg"],
-              }).then((result) => {
-                if (result['isConfirmed']) {
-                  localStorage.clear()
-                  redirect("/")
-                }
-              })
-              break;
-            case 10:
-              ReactSwal.fire({
-                icon: 'error',
-                title: 'Problemas...',
-                text: msg["msg"],
-              })
-              break;
-          }
-        }
-        ))
-    }
-
-  }
-  
+  const { pathname } = useLocation()
+  const { userName, tipoUsuario, fotoPerfil } = getSession()
+  const items = userName ? (menuPorTipo[tipoUsuario] ?? menuPorTipo.Especialista) : []
 
   return (
-    <div className='relative z-10 '>
+    <div className='relative z-40'>
       <Topbar />
-      <Navbar isBordered className="font-['Robot', sans-serif] px-10  md:px-32" onMenuOpenChange={setIsMenuOpen}>
+      <Navbar isBordered maxWidth="xl" isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen} classNames={{ wrapper: "px-4 sm:px-6 lg:px-8" }}>
         <NavbarContent>
-          <NavbarMenuToggle
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-            className="sm:hidden"
-          />
+          <NavbarMenuToggle aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"} className="md:hidden" />
           <NavbarBrand>
-            <Link to="/" className="font-['Poppins', sans-serif] font-[650] text-[32px]">Empl<span className="text-Primary">ify</span></Link>
+            <Logo />
           </NavbarBrand>
         </NavbarContent>
 
-
-
-        <NavbarContent className='hidden md:flex' justify="end">
-          {
-            (localStorage.getItem("userName") == null)
-              ?
-              (<><NavbarItem className="hidden lg:flex">
-                <span className='mr-2'><DropdownHeader linkCliente='/clientes/login' linkEspecialista='/especialistas/login' label='Iniciar sesión' /></span>
+        <NavbarContent className='hidden gap-2 md:flex' justify="end">
+          {!userName ? (
+            <>
+              <NavbarItem>
+                <Dropdown placement="bottom-end">
+                  <DropdownTrigger>
+                    <Button variant="light" endContent={<FontAwesomeIcon size='xs' icon={faChevronDown} />}>Iniciar sesión</Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Iniciar sesión como" color="primary" onAction={(key) => redirect(key)}>
+                    <DropdownItem key="/clientes/login" description="Busca y contrata profesionales">Como cliente</DropdownItem>
+                    <DropdownItem key="/especialistas/login" description="Gestiona tus trabajos">Como especialista</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </NavbarItem>
-                <NavbarItem  >
-                  <span><DropdownHeader linkCliente='/clientes/register' linkEspecialista='/especialistas/register' label='Registrarse' /></span>
-                </NavbarItem></>)
-              :
-              !(localStorage.getItem("tipoUsuario") == "Cliente")
-                ?
-                (<NavbarItem  >
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button
-                        variant="light"
-                        endContent={<FontAwesomeIcon size='xs' icon={faChevronDown}></FontAwesomeIcon>}
-                        startContent={<Avatar size='sm' showFallback color="secondary" src={`https://emplifyapi.burzuam.dpdns.org/resources/images/${localStorage.getItem("fotoPerfil")}`} />}
-                      >
-                        {localStorage.getItem("userName")}
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu color='secondary' aria-label="Static Actions">
-                      <DropdownItem key="new">Mi cuenta</DropdownItem>
-                      <DropdownItem key="perfil">Mi perfil</DropdownItem>
-                      <DropdownItem key="edit" onPress={() => { redirect('/especialistas/solicitudesTrabajo') }}>Solicitudes de trabajo</DropdownItem>
-                      <DropdownItem key="delete" className="text-danger" onPress={() => logout()} color="danger" startContent={<FontAwesomeIcon size='1x' icon={faRightFromBracket}></FontAwesomeIcon>}>
-                        Cerrar sesión
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-
-                </NavbarItem>)
-                :
-                (<NavbarItem  >
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button
-                        variant="light"
-                        endContent={<FontAwesomeIcon size='xs' icon={faChevronDown}></FontAwesomeIcon>}
-                        startContent={<Avatar size='sm' showFallback  src={`https://emplifyapi.burzuam.dpdns.org/resources/images/${localStorage.getItem("fotoPerfil")}`} color="secondary"  />}
-                      >
-                        {localStorage.getItem("userName")}
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu color='secondary' aria-label="Static Actions">
-                      <DropdownItem key="cuenta" onPress={() => { redirect('/clientes/cuenta') }}>Mi cuenta</DropdownItem>
-                      <DropdownItem key="historialTrabajo" onPress={() => { redirect('/clientes/historialTrabajos') }}>Historial</DropdownItem>
-                      <DropdownItem key="edit">Edit file</DropdownItem>
-                      <DropdownItem key="delete" className="text-danger" onPress={() => logout()} color="danger" startContent={<FontAwesomeIcon size='1x' icon={faRightFromBracket}></FontAwesomeIcon>}>
-                        Cerrar sesión
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
-
-                </NavbarItem>)
-          }
-
+              <NavbarItem>
+                <Dropdown placement="bottom-end">
+                  <DropdownTrigger>
+                    <Button color="primary" endContent={<FontAwesomeIcon size='xs' icon={faChevronDown} />}>Registrarse</Button>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Registrarse como" color="primary" onAction={(key) => redirect(key)}>
+                    <DropdownItem key="/clientes/register" description="Encuentra al profesional ideal">Como cliente</DropdownItem>
+                    <DropdownItem key="/especialistas/register" description="Ofrece tus servicios">Como especialista</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </NavbarItem>
+            </>
+          ) : (
+            <NavbarItem>
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Button
+                    variant="light"
+                    endContent={<FontAwesomeIcon size='xs' icon={faChevronDown} />}
+                    startContent={<Avatar size='sm' showFallback name={userName} color="primary" src={imageUrl(fotoPerfil)} />}
+                  >
+                    {userName}
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu color='primary' aria-label="Menú de usuario" onAction={(key) => key == "logout" ? logout(redirect) : redirect(key)}>
+                  <DropdownSection showDivider>
+                    {items.map(item => (
+                      <DropdownItem key={item.to} startContent={<FontAwesomeIcon fixedWidth icon={item.icon} />}>{item.label}</DropdownItem>
+                    ))}
+                  </DropdownSection>
+                  <DropdownSection>
+                    <DropdownItem key="logout" className="text-danger" color="danger" startContent={<FontAwesomeIcon fixedWidth icon={faRightFromBracket} />}>
+                      Cerrar sesión
+                    </DropdownItem>
+                  </DropdownSection>
+                </DropdownMenu>
+              </Dropdown>
+            </NavbarItem>
+          )}
         </NavbarContent>
 
-        <NavbarMenu>
-          <NavbarMenuItem >
-            <Accordion showDivider={false} variant='light' isCompact>
-              <AccordionItem key="1" aria-label="Accordion 1" title="Iniciar sesión">
-
-                <Listbox
-                  variant='light'
-                  aria-label="Actions"
-                  color='secondary'
-                >
-                  <ListboxItem ><Link to="/clientes/login">Como cliente</Link></ListboxItem>
-                  <ListboxItem ><Link to="/especialistas/login">Como especialista</Link></ListboxItem>
-                </Listbox>
-
-              </AccordionItem>
-              <AccordionItem key="2" aria-label="Accordion 2" title="Registrarse">
-                <Listbox
-                  variant='light'
-                  aria-label="Actions"
-                  color='secondary'
-                >
-                  <ListboxItem ><Link to="/clientes/register">Como cliente</Link></ListboxItem>
-                  <ListboxItem ><Link to="/especialistas/register">Como especialista</Link></ListboxItem>
-                </Listbox>
-              </AccordionItem>
-            </Accordion>
-          </NavbarMenuItem>
-          <NavbarMenuItem className='text-md ml-2'>
-            <Link to="/clientes/historialTrabajos">Historial</Link>
-          </NavbarMenuItem>
-
-          <NavbarMenuItem className='text-md ml-2 '>
-            <Link to="/clientes/configuracionClientes">Mi cuenta</Link>
-          </NavbarMenuItem>
-          <NavbarMenuItem className='text-md ml-2 '>
-            <Link>Soporte</Link>
-          </NavbarMenuItem>
-          <NavbarMenuItem className='text-md ml-2 '>
-            <Link>Regístrate como especialista</Link>
-          </NavbarMenuItem>
-          <NavbarMenuItem className='text-md ml-2 '>
-            <Link>Términos y condiciones</Link>
-          </NavbarMenuItem>
-          <NavbarMenuItem className='text-md ml-2'>
-            <Link className='text-Primary'>Invita a tus amigos</Link>
-          </NavbarMenuItem>
-          <NavbarMenuItem className='text-md ml-2'>
-            <Link className='text-danger-500'>Cerrar sesión</Link>
-          </NavbarMenuItem>
+        <NavbarMenu className="gap-1 pt-4">
+          {!userName ? (
+            accesoInvitado.map(grupo => (
+              <div key={grupo.titulo} className="mb-3">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-ink-muted">{grupo.titulo}</p>
+                <NavbarMenuItem>
+                  <Link to={grupo.cliente} className="block rounded-lg px-2 py-2 text-lg hover:bg-default-100">Como cliente</Link>
+                </NavbarMenuItem>
+                <NavbarMenuItem>
+                  <Link to={grupo.especialista} className="block rounded-lg px-2 py-2 text-lg hover:bg-default-100">Como especialista</Link>
+                </NavbarMenuItem>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="mb-3 flex items-center gap-3 border-b border-default-100 pb-4">
+                <Avatar showFallback name={userName} color="primary" src={imageUrl(fotoPerfil)} />
+                <div>
+                  <p className="font-semibold text-ink">{userName}</p>
+                  <p className="text-sm text-ink-muted">{tipoUsuario}</p>
+                </div>
+              </div>
+              {items.map(item => (
+                <NavbarMenuItem key={item.to} isActive={pathname == item.to}>
+                  <Link to={item.to} className={`flex items-center gap-3 rounded-lg px-2 py-2 text-lg hover:bg-default-100 ${pathname == item.to ? "text-brand-500" : ""}`}>
+                    <FontAwesomeIcon fixedWidth icon={item.icon} />{item.label}
+                  </Link>
+                </NavbarMenuItem>
+              ))}
+              <NavbarMenuItem>
+                <button type="button" onClick={() => logout(redirect)} className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-lg text-danger hover:bg-danger-50">
+                  <FontAwesomeIcon fixedWidth icon={faRightFromBracket} />Cerrar sesión
+                </button>
+              </NavbarMenuItem>
+            </>
+          )}
         </NavbarMenu>
-
       </Navbar>
-
     </div>
   )
 }

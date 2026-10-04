@@ -5,22 +5,23 @@ import { AdminClientes } from "./AdminClientes"
 import { AdminReportes } from "./AdminReportes"
 import { AdminLogin } from "./AdminLogin"
 import { AdminSolicitudes } from "./AdminSolicitudes"
+
+const vistas = {
+    cliente: AdminClientes,
+    profesionales: AdminProfesionales,
+    reportes: AdminReportes,
+    solicitudes: AdminSolicitudes,
+}
+
 export const Admin = () => {
     const [vista] = useGlobalState("vistaAdmin")
-    return (
-        <>
-            {
-                (vista == "inicial")
-                    ? <AdminLogin></AdminLogin>
-                    : (vista == "cliente")
-                        ? <><NavBar></NavBar> <AdminClientes ></AdminClientes></>
-                        : (vista == "profesionales")
-                            ? <><NavBar></NavBar> <AdminProfesionales ></AdminProfesionales></>
-                            : (vista == "reportes")
-                                ? <><NavBar></NavBar> <AdminReportes></AdminReportes></>
-                                : <><NavBar></NavBar> <AdminSolicitudes></AdminSolicitudes></>
-            }
+    if (vista == "inicial") return <AdminLogin />
 
-        </>
+    const Vista = vistas[vista] ?? AdminSolicitudes
+    return (
+        <div className="min-h-screen bg-surface-muted">
+            <NavBar />
+            <Vista />
+        </div>
     )
 }

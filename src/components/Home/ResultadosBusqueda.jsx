@@ -1,311 +1,173 @@
 import { Header } from "../Global/Header"
-import { Dropdown, DropdownTrigger, Input, Button, DropdownMenu, DropdownItem, Card, CardBody, CardFooter, CardHeader, Avatar, Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react"
-import { faChevronDown, faMagnifyingGlass, faChevronUp, faLocationDot, faAddressCard, faBriefcase, faWrench } from '@fortawesome/free-solid-svg-icons'
+import { Footer } from "../Global/Footer"
+import { SearchBar } from "../Global/SearchBar"
+import { Button, Avatar, Select, SelectItem, Chip } from "@nextui-org/react"
+import { faLocationDot, faBriefcase, faMagnifyingGlass, faSliders } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useEffect, useMemo, useState } from "react"
-import { useGlobalState } from "../../../global_states/searchResults"
-import { useNavigate } from "react-router-dom"
-import { v4 } from "uuid"
+import { useLocation, useNavigate } from "react-router-dom"
+import { EmptyState } from "../ui/EmptyState"
+import { formatPrecio, imageUrl, parsePrecio } from "../../lib/format"
+
+const opcionesOrden = [
+    { key: "relevancia", label: "Más relevantes" },
+    { key: "nombre", label: "Nombre (A-Z)" },
+    { key: "precio", label: "Menor precio" },
+]
+
+const opcionesDisponibilidad = [
+    { key: "todos", label: "Todos" },
+    { key: "Disponible", label: "Disponible" },
+    { key: "Contratado", label: "Contratado" },
+]
+
+const opcionesPrecio = [
+    { key: "0", label: "Cualquier precio" },
+    { key: "100000", label: "Hasta $100.000" },
+    { key: "200000", label: "Hasta $200.000" },
+    { key: "500000", label: "Hasta $500.000" },
+    { key: "1000000", label: "Hasta $1.000.000" },
+]
+
+const precioMinimo = (especialista) => {
+    const precios = (especialista.perfil?.servicios ?? [])
+        .map(servicio => parsePrecio(Object.values(servicio)[0]))
+        .filter(precio => precio !== null)
+    return precios.length ? Math.min(...precios) : null
+}
 
 export const ResultadosBusqueda = () => {
     const [searchResults, setSearchResults] = useState([])
-    const [preciosDesde, setPreciosDesde] = useState(new Set(["$100.000"]));
+    const [orden, setOrden] = useState("relevancia")
+    const [disponibilidad, setDisponibilidad] = useState("todos")
+    const [precioMax, setPrecioMax] = useState("0")
+    const [mostrarFiltros, setMostrarFiltros] = useState(false)
     const redirect = useNavigate()
-
-    const precioDesde = useMemo(
-        () => Array.from(preciosDesde).join(", "),
-        [preciosDesde]
-    );
-
-    const [preciosHasta, setPreciosHasta] = useState(new Set(["$2.000.000"]));
-
-    const precioHasta = useMemo(
-        () => Array.from(preciosHasta).join(", "),
-        [preciosHasta]
-    );
-
-    const [estrellas, setEstrellas] = useState(new Set(["5 estrellas"]));
-
-    const estrella = useMemo(
-        () => Array.from(estrellas).join(", "),
-        [estrellas]
-    );
-
-    const [disponibilidades, setDisponibilidad] = useState(new Set(["Disponible"]));
-
-    const disponibilidad = useMemo(
-        () => Array.from(disponibilidades).join(", "),
-        [disponibilidades]
-    );
-
-    const [mostrarFiltros, setMostrarFiltros] = useState("hidden")
-    const [mostrarBusqueda, setMostrarBusqueda] = useState("hidden")
-    const [changeChevron, setChangeChevron] = useState(true)
-    const [colorFiltro, setColorFiltro] = useState("")
-    const [colorBusqueda, setColorBusqueda] = useState("")
-
-    const handleFiltros = () => {
-        if (mostrarFiltros == "hidden") {
-            setChangeChevron(false)
-            setMostrarFiltros("flex")
-            setColorFiltro("text-Primary")
-        } else {
-            setChangeChevron(true)
-            setMostrarFiltros("hidden")
-            setColorFiltro("text-")
-        }
-    }
-
-    const handleBusqueda = () => {
-        if (mostrarBusqueda == "hidden") {
-            setMostrarBusqueda("flex")
-            setColorBusqueda("text-Primary")
-        } else {
-            setMostrarBusqueda("hidden")
-            setColorBusqueda("text-")
-        }
-    }
+    const location = useLocation()
 
     useEffect(() => {
-        setSearchResults( JSON.parse(localStorage.getItem("searchResults")))
-    }, [])
+        try {
+            setSearchResults(JSON.parse(localStorage.getItem("searchResults")) ?? [])
+        } catch {
+            setSearchResults([])
+        }
+    }, [location.state])
+
+    const resultados = useMemo(() => {
+        let lista = [...searchResults]
+        if (disponibilidad != "todos") lista = lista.filter(e => e.disponibilidad == disponibilidad)
+        if (precioMax != "0") lista = lista.filter(e => {
+            const precio = precioMinimo(e)
+            return precio !== null && precio <= Number(precioMax)
+        })
+        if (orden == "nombre") lista.sort((a, b) => `${a.nombres} ${a.apellidos}`.localeCompare(`${b.nombres} ${b.apellidos}`, "es"))
+        if (orden == "precio") lista.sort((a, b) => (precioMinimo(a) ?? Infinity) - (precioMinimo(b) ?? Infinity))
+        return lista
+    }, [searchResults, orden, disponibilidad, precioMax])
+
+    const hayFiltros = disponibilidad != "todos" || precioMax != "0"
+    const limpiarFiltros = () => { setDisponibilidad("todos"); setPrecioMax("0") }
+
+    const visitarPerfil = (especialista) => {
+        localStorage.setItem("perfilEspecialista", JSON.stringify(especialista))
+        redirect("/buscar/perfilEspecialista")
+    }
+
+    const rubro = localStorage.getItem("rubro")
+    const comuna = localStorage.getItem("comuna")
 
     return (
-        <>
+        <div className="flex min-h-screen flex-col bg-surface-muted">
             <Header />
-            <div className="container m-auto">
-                <section className="flex sticky top-0 z-30 bg-white sm:hidden justify-between gap-3 px-16 py-2 text-[1.01rem] font-[500]" >
-                    <span className={colorFiltro + " hover:cursor-pointer"} onClick={handleFiltros}>
-                        <span className="mr-3">Filtros</span>
-                        {(changeChevron) ? (
-                            <span ><FontAwesomeIcon size="sm" icon={faChevronDown} /></span>
 
-                        ) : (
-
-                            <span ><FontAwesomeIcon size="sm" icon={faChevronUp} /></span>
-                        )}
-                    </span>
-                    <span className={colorBusqueda + " hover:cursor-pointer"} onClick={handleBusqueda}>
-                        <span className="mr-3">Buscar</span>
-                        <span ><FontAwesomeIcon size="sm" icon={faMagnifyingGlass} /></span>
-                    </span>
-                </section>
-
-                <section className={mostrarFiltros + " sm:sticky  top-0 z-30 bg-white  flex-col items-start px-16 sm:flex sm:flex-row sm:justify-between lg:px-36 2xl:px-64  p-5 border-b-1 w-full gap-5"}>
-
-                    <Dropdown >
-                        <DropdownTrigger>
-                            <Button
-                                color="secondary"
-                                variant="flat"
-                            >
-                                Ordenar por <FontAwesomeIcon size="sm" icon={faChevronDown} />
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu aria-label="Static Actions">
-                            <DropdownItem key="new">Reputación</DropdownItem>
-                            <DropdownItem key="copy">Relevantes</DropdownItem>
-                            <DropdownItem key="edit">Más cercanos</DropdownItem>
-                        </DropdownMenu>
-                    </Dropdown>
-                    <span className="flex flex-col sm:flex-row gap-3">
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <Input
-                                    value={disponibilidad}
-                                    variant="underlined"
-                                    label="Mostrar:"
-                                    labelPlacement="outside-left"
-                                    endContent={<FontAwesomeIcon size="xs" icon={faChevronDown} />}
-                                    type="text"
-                                />
-                            </DropdownTrigger>
-                            <DropdownMenu aria-label="Static Actions"
-                                disallowEmptySelection
-                                selectionMode="single"
-                                selectedKeys={disponibilidades}
-                                onSelectionChange={setDisponibilidad}
-                            >
-                                <DropdownItem key="Disponible">Disponible</DropdownItem>
-                                <DropdownItem key="Contratado">Contratado</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
-
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <Input
-                                    value={precioDesde}
-                                    variant="underlined"
-                                    label="Precio desde:"
-                                    labelPlacement="outside-left"
-                                    endContent={<FontAwesomeIcon size="xs" icon={faChevronDown} />}
-                                    type="text"
-                                />
-                            </DropdownTrigger>
-                            <DropdownMenu aria-label="Static Actions"
-                                disallowEmptySelection
-                                selectionMode="single"
-                                selectedKeys={preciosDesde}
-                                onSelectionChange={setPreciosDesde}
-                            >
-                                <DropdownItem key="$100.000">$100.000</DropdownItem>
-                                <DropdownItem key="$200.000">$200.000</DropdownItem>
-                                <DropdownItem key="$500.000">$500.000</DropdownItem>
-                                <DropdownItem key="$1.000.000">$1.000.000</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
-
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <Input
-                                    value={precioHasta}
-                                    variant="underlined"
-                                    label="Precio hasta:"
-                                    labelPlacement="outside-left"
-                                    endContent={<FontAwesomeIcon size="xs" icon={faChevronDown} />}
-                                    type="text"
-                                />
-                            </DropdownTrigger>
-                            <DropdownMenu aria-label="Static Actions"
-                                disallowEmptySelection
-                                selectionMode="single"
-                                selectedKeys={precioHasta}
-                                onSelectionChange={setPreciosHasta}
-                            >
-                                <DropdownItem key="$2.000.000">$2.000.000</DropdownItem>
-                                <DropdownItem key="$5.000.000">$5.000.000</DropdownItem>
-                                <DropdownItem key="$8.000.000">$8.000.000</DropdownItem>
-                                <DropdownItem key="$10.000.000">$10.000.000</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
-                    </span>
-                    <span>
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <Input
-                                    value={estrella}
-                                    variant="underlined"
-                                    label="Calificación mínima"
-                                    labelPlacement="outside-left"
-                                    endContent={<FontAwesomeIcon size="xs" icon={faChevronDown} />}
-                                    type="text"
-                                />
-                            </DropdownTrigger>
-                            <DropdownMenu aria-label="Static Actions"
-                                disallowEmptySelection
-                                selectionMode="single"
-                                selectedKeys={estrella}
-                                onSelectionChange={setEstrellas}
-                            >
-
-                                <DropdownItem key="5 estrellas">5 estrellas</DropdownItem>
-                                <DropdownItem key="4 estrellas">4 estrellas</DropdownItem>
-                                <DropdownItem key="3 estrellas">3 estrellas</DropdownItem>
-                                <DropdownItem key="2 estrellas">2 estrellas</DropdownItem>
-                                <DropdownItem key="1 estrella">1 estrella</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
-                    </span>
-                </section>
-
-                <section className={mostrarBusqueda + " sm:flex justify-between items-center gap-3 mt-4 w-full px-16 lg:px-36 2xl:px-64"}>
-                    <Input
-                        placeholder="Ciudad o Comuna"
-                        className=""
-
-                        endContent={
-                            <div className="flex items-center">
-
-                                <select
-                                    className="outline-none border-0 bg-transparent text-default-400 text-small w-16 sm:w-auto"
-                                    id="currency"
-                                    name="currency"
-                                >
-                                    <option>Rubro</option>
-                                    <option>Informática</option>
-                                    <option>Construcción</option>
-                                    <option>Electricidad</option>
-                                </select>
-
-                            </div>
-                        }
-                        type="text"
-                    />
-                    <Button color="secondary" className="sm:mt-0 ">
-                        <span><FontAwesomeIcon icon={faMagnifyingGlass}></FontAwesomeIcon> Buscar</span>
-                    </Button>
-
-                </section>
-
-                <div className="px-16 sm:flex sm:flex-col sm:justify-between lg:px-36 2xl:px-64  p-5">
-                    <h1 className="text-[1.8rem] font-[500] ">Resultados de la búsqueda</h1>
-                    <h4 className="text-[1.1rem] font-[500] ">{localStorage.getItem("rubro")} en {localStorage.getItem("comuna")}</h4>
-                    
-                    {
-                        searchResults.map((especialista) => {
-                            return (
-                                <Card key={`${v4()}_${especialista._id}`} className="mt-2">
-                                    <CardHeader className="justify-between">
-                                        <div className="flex gap-5">
-                                            <Avatar color="secondary" isBordered radius="full" size="lg" showFallback src={`https://emplifyapi.burzuam.dpdns.org/resources/images/${especialista.perfil.foto}`} />
-                                            <div className="flex flex-col gap-1 items-start justify-center">
-                                                <h4 className="text-small font-semibold leading-none text-default-600">{`${especialista.nombres} ${especialista.apellidos}`}</h4>
-                                                <h5 className="text-small tracking-tight text-default-400">{especialista.profesion}</h5>
-                                                <h5 className="text-small tracking-tight text-Primary">★★★★★ <span className="text-default-600 text-xs font-semibold">70 opiniones</span></h5>
-                                            </div>
-                                        </div>
-                                    </CardHeader>
-                                    <CardBody className="px-3 text-small text-default-500">
-                                        <span className="pb-2">
-                                            <span>
-                                                <FontAwesomeIcon className="text-md text-default-500 pr-2" icon={faLocationDot} />
-                                            </span>
-                                            {especialista.comuna}
-                                        </span>
-                                        <p>
-                                            <span><FontAwesomeIcon className="text-md text-default-500 pr-2" icon={faAddressCard} /></span>
-                                            {especialista.perfil.experiencia}
-                                        </p>
-                                        <span className="pt-2">
-                                            <span>
-                                                <FontAwesomeIcon className="text-md text-default-500 pr-2" icon={faBriefcase} />
-                                            </span>
-                                            {especialista.perfil.antiguedad} años en la plataforma
-                                        </span>
-                                        <span className="pt-2">
-                                            <span>
-                                                <FontAwesomeIcon className="text-md text-default-500 pr-2" icon={faWrench} />
-                                            </span>
-                                            {especialista.perfil.servicios.map(servicio => {
-                                                return (
-                                                    <>
-                                                        <Popover color="none" size="sm" placement="bottom">
-                                                            <PopoverTrigger>
-                                                                <Button className="text-default-500 " variant="light"><span className="text-xs">{Object.keys(servicio)[0]} <br /><small>Ver precio <FontAwesomeIcon size="xs" icon={faChevronDown} /></small></span></Button>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent>
-                                                                <div className="px-1 py-2">
-                                                                    <div className="text-small font-bold">${Object.values(servicio)[0]}</div>
-                                                                </div>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                    </>
-                                                )
-                                            })}
-
-                                        </span>
-                                    </CardBody>
-                                    <CardFooter className="gap-3 flex justify-between">
-                                        <p className="font-semibold text-green-400 text-small">{especialista.disponibilidad}</p>
-                                        <Button color="secondary" className="" type="button" onClick={() => redirect("/buscar/perfilEspecialista", localStorage.setItem("perfilEspecialista", JSON.stringify(especialista)))}>Visitar perfil</Button>
-                                    </CardFooter>
-                                </Card>
-                            )
-                        })
-                    }
-
+            <section className="border-b border-default-100 bg-white">
+                <div className="page-container py-4">
+                    <SearchBar size="md" defaultComuna={comuna ?? ""} />
                 </div>
-            </div>
-        </>
+            </section>
+
+            <main className="page-container flex-1 py-8">
+                <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold sm:text-3xl">Resultados de la búsqueda</h1>
+                        {rubro && comuna && (
+                            <p className="mt-1 text-ink-muted">
+                                {resultados.length} {resultados.length == 1 ? "profesional" : "profesionales"} de <strong className="text-ink">{rubro}</strong> en <strong className="text-ink">{comuna}</strong>
+                            </p>
+                        )}
+                    </div>
+                    <Button className="md:hidden" variant="bordered" startContent={<FontAwesomeIcon icon={faSliders} />} onPress={() => setMostrarFiltros(v => !v)} aria-expanded={mostrarFiltros}>
+                        Filtros{hayFiltros && " •"}
+                    </Button>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-[16rem_1fr]">
+                    <aside className={`${mostrarFiltros ? "flex" : "hidden"} card h-fit flex-col gap-4 p-5 md:sticky md:top-20 md:flex`} aria-label="Filtros">
+                        <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-muted">Filtrar y ordenar</h2>
+                        <Select label="Ordenar por" size="sm" variant="bordered" disallowEmptySelection selectedKeys={[orden]} onSelectionChange={k => setOrden(Array.from(k)[0])}>
+                            {opcionesOrden.map(o => <SelectItem key={o.key} value={o.key}>{o.label}</SelectItem>)}
+                        </Select>
+                        <Select label="Disponibilidad" size="sm" variant="bordered" disallowEmptySelection selectedKeys={[disponibilidad]} onSelectionChange={k => setDisponibilidad(Array.from(k)[0])}>
+                            {opcionesDisponibilidad.map(o => <SelectItem key={o.key} value={o.key}>{o.label}</SelectItem>)}
+                        </Select>
+                        <Select label="Precio" size="sm" variant="bordered" disallowEmptySelection selectedKeys={[precioMax]} onSelectionChange={k => setPrecioMax(Array.from(k)[0])}>
+                            {opcionesPrecio.map(o => <SelectItem key={o.key} value={o.key}>{o.label}</SelectItem>)}
+                        </Select>
+                        {hayFiltros && <Button size="sm" variant="light" color="primary" onPress={limpiarFiltros}>Limpiar filtros</Button>}
+                    </aside>
+
+                    <section className="flex flex-col gap-4" aria-live="polite">
+                        {resultados.length == 0 ? (
+                            <div className="card">
+                                {searchResults.length == 0 ? (
+                                    <EmptyState icon={faMagnifyingGlass} title="Aún no hay resultados" description="Ingresa tu comuna y el rubro que necesitas para encontrar profesionales cerca de ti." />
+                                ) : (
+                                    <EmptyState icon={faSliders} title="Ningún profesional coincide con los filtros" description="Prueba ampliando el rango de precio o cambiando la disponibilidad." action={<Button color="primary" variant="flat" onPress={limpiarFiltros}>Limpiar filtros</Button>} />
+                                )}
+                            </div>
+                        ) : resultados.map((especialista) => {
+                            const nombre = `${especialista.nombres} ${especialista.apellidos}`
+                            const disponible = especialista.disponibilidad == "Disponible"
+                            return (
+                                <article key={especialista._id} className="card flex flex-col gap-4 p-5 sm:flex-row">
+                                    <Avatar color="primary" isBordered radius="full" className="h-16 w-16 shrink-0" showFallback name={nombre} src={imageUrl(especialista.perfil?.foto)} />
+                                    <div className="flex min-w-0 flex-1 flex-col gap-2">
+                                        <div className="flex flex-wrap items-start justify-between gap-2">
+                                            <div>
+                                                <h2 className="text-lg font-semibold">{nombre}</h2>
+                                                <p className="text-sm text-ink-muted">{especialista.profesion}</p>
+                                            </div>
+                                            {especialista.disponibilidad && (
+                                                <Chip size="sm" variant="flat" color={disponible ? "success" : "default"}>{especialista.disponibilidad}</Chip>
+                                            )}
+                                        </div>
+                                        {especialista.perfil?.experiencia && <p className="line-clamp-2 text-sm text-ink-body">{especialista.perfil.experiencia}</p>}
+                                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-muted">
+                                            <span><FontAwesomeIcon className="mr-1.5" icon={faLocationDot} />{especialista.comuna?.nombre ?? especialista.comuna}</span>
+                                            {especialista.perfil?.antiguedad !== undefined && (
+                                                <span><FontAwesomeIcon className="mr-1.5" icon={faBriefcase} />{especialista.perfil.antiguedad} años en Emplify</span>
+                                            )}
+                                        </div>
+                                        {especialista.perfil?.servicios?.length > 0 && (
+                                            <ul className="mt-1 flex flex-wrap gap-2" aria-label="Servicios">
+                                                {especialista.perfil.servicios.map(servicio => (
+                                                    <li key={Object.keys(servicio)[0]} className="rounded-lg bg-default-100 px-2.5 py-1 text-xs text-ink-body">
+                                                        {Object.keys(servicio)[0]} · <strong className="text-ink">{formatPrecio(Object.values(servicio)[0])}</strong>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                    <div className="flex items-end sm:items-center">
+                                        <Button color="primary" className="w-full sm:w-auto" onPress={() => visitarPerfil(especialista)}>Ver perfil</Button>
+                                    </div>
+                                </article>
+                            )
+                        })}
+                    </section>
+                </div>
+            </main>
+            <Footer />
+        </div>
     )
 }

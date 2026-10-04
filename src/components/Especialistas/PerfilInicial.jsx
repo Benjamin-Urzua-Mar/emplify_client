@@ -1,234 +1,172 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Button, Image, Textarea, Input, input } from "@nextui-org/react"
-import { Link } from "react-router-dom"
-import { faPlus, faX } from "@fortawesome/free-solid-svg-icons"
-import { faGoogle, faFacebookF } from "@fortawesome/free-brands-svg-icons"
-import { useCallback, useEffect, useRef, useState } from "react";
-import KeepAlive from "react-activation"
+import { Button, Textarea, Input, Avatar } from "@nextui-org/react"
+import { faPlus, faTrash, faCamera } from "@fortawesome/free-solid-svg-icons"
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom"
-import Swal from "sweetalert2"
-import withReactContent from "sweetalert2-react-content"
+import { AuthLayout } from "../ui/AuthLayout"
+import { StepIndicator } from "../ui/StepIndicator"
+import { ReactSwal, alertError, alertNetworkError, alertSuccess } from "../../lib/alerts"
+
+const pasosPerfil = ["Foto", "Sobre ti", "Servicios"]
 
 export const PerfilInicial = () => {
     const [selectedFile, setSelectedFile] = useState()
     const [preview, setPreview] = useState()
+    const [experiencia, setExperiencia] = useState("")
+    const [servicios, setServicios] = useState([])
+    const [pasos, setPasos] = useState(1)
+    const [isLoading, setIsLoading] = useState(false)
     const inputImage = useRef()
-    const btnAtras = useRef()
-    const btnSiguiente = useRef()
-    const [enableFinalizar, setEnableFinalizar] = useState(true)
-    let [pasos, setPasos] = useState(1)
+    const formPerfil = useRef()
     const redirect = useNavigate()
 
     useEffect(() => {
         if (!selectedFile) {
-            setPreview("https://placehold.jp/40px/ffffff/7828c8/300x300.png?text=Arrastre%20aqu%C3%AD%20su%20foto&css=%7B%22border-radius%22%3A%22100%25%22%2C%22background%22%3A%22%20-webkit-%22%7D")
+            setPreview(undefined)
             return
         }
-        try {
-            const objUrl = URL.createObjectURL(selectedFile)
-            setPreview(objUrl)
-
-            return () => URL.revokeObjectURL(objUrl)
-        } catch (error) {
-            return
-        }
-
+        const objUrl = URL.createObjectURL(selectedFile)
+        setPreview(objUrl)
+        return () => URL.revokeObjectURL(objUrl)
     }, [selectedFile])
 
-
     const onSelectFile = e => {
-
-        if (!e.target.files || e.target.files.length === 0) {
-            setSelectedFile("https://placehold.jp/40px/ffffff/7828c8/300x300.png?text=Arrastre%20aqu%C3%AD%20su%20foto&css=%7B%22border-radius%22%3A%22100%25%22%2C%22background%22%3A%22%20-webkit-%22%7D")
-            return
-        }
-
+        if (!e.target.files || e.target.files.length === 0) return
         setSelectedFile(e.target.files[0])
     }
 
-    const handlePasos = (op) => {
-        if (pasos > 0) {
+    const siguiente = () => setPasos(p => Math.min(p + 1, pasosPerfil.length))
+    const atras = () => setPasos(p => Math.max(p - 1, 1))
 
-            if (op == "suma") {
-                btnSiguiente.current.click()
-                setPasos(pasos++)
-            } else {
-                btnAtras.current.click()
-                setPasos(pasos--)
-
-            }
-        } else {
-            setPasos(1)
-        }
+    const handleChanges = (valor, campo, i) => {
+        setServicios(lista => lista.map((s, idx) => idx == i ? { ...s, [campo]: valor } : s))
     }
+    const handleAdd = () => setServicios(lista => [...lista, { trabajo: "", precio: "" }])
+    const handleDelete = (i) => setServicios(lista => lista.filter((_, idx) => idx != i))
 
-    const handleChanges = (onChangeValue, tipo, i) => {
-        const inputData = [...val]
-        if (tipo == "trabajo") {
-            inputData[i]["trabajo"] = onChangeValue.currentTarget.value;
-        } else {
-            inputData[i]["precio"] = onChangeValue.currentTarget.value;
-        }
-        setVal(inputData)
-    }
-
-    const [val, setVal] = useState([])
-    const handleAdd = () => {
-        setEnableFinalizar(false)
-        const abc = [...val, []]
-        setVal(abc)
-    }
-    const handleDelete = (i) => {
-        const deleteVal = [...val]
-        deleteVal.splice(i, 1)
-        setVal(deleteVal)
-    }
-
-    const renderPasos = useCallback((pasos) => {
-        switch (pasos) {
-            case 1:
-                return (
-                    <>
-                        <Image
-                            width={200}
-                            alt="NextUI hero Image"
-                            src={preview}
-                            className="rounded-full  border-Primary border-2"
-                            fallbackSrc="https://placehold.jp/40px/ffffff/7828c8/300x300.png?text=Arrastre%20aqu%C3%AD%20su%20foto&css=%7B%22border-radius%22%3A%22100%25%22%2C%22background%22%3A%22%20-webkit-%22%7D"
-                        />
-                        <input ref={inputImage} onChange={(e) => onSelectFile(e)} type="file" aria-description="Arrastre aqui" className="bg-red-500 py-32 z-10 opacity-0 absolute  rounded-full " />
-                        <Button color="secondary" className="w-full my-4 z-20" onClick={() => inputImage.current.click()}>Subir foto</Button>
-                    </>
-                );
-
-            case 2:
-                return (
-                    <KeepAlive>
-                        <Textarea
-                            label="Cuenta un poco sobre ti"
-                            labelPlacement="outside"
-                            placeholder="Sugerimos orientar tu descripción en torno a tu experiencia laboral"
-                            fullWidth="true"
-                            ref={txt_experiencia}
-                        />
-                    </KeepAlive>
-                );
-            case 3:
-                return (
-                    <>
-                        <span className="inline-flex gap-3 my-1">
-                            <span className="mt-1 font-semibold text-default-600 text-medium ">Agrega los servicios que ofreces</span>
-                            <Button color="success" type="button" onClick={() => handleAdd()} className="text-white" isIconOnly><FontAwesomeIcon icon={faPlus}></FontAwesomeIcon></Button>
-                        </span>
-
-                        {val.map((data, i) => {
-                            return (
-                                <span key={i}>
-                                    <span className="inline-flex gap-2 my-2">
-                                        <Input
-                                            className="outline-none border-0  bg-transparent "
-                                            placeholder="Nombre del servicio"
-                                            onChange={(e) => handleChanges(e, "trabajo", i)}
-                                            value={data["trabajo"]}
-                                            endContent={
-                                                <input
-                                                    onChange={(e) => handleChanges(e, "precio", i)}
-                                                    className="outline-none border-0 w-20 bg-transparent font-normal placeholder:text-foreground-500 text-small"
-                                                    placeholder="$ 1.000.000"
-                                                    value={data["precio"]}
-                                                />
-                                            }
-                                        />
-                                        <Button color="danger" type="button" className="text-white" onClick={() => handleDelete(i)} isIconOnly><FontAwesomeIcon icon={faX}></FontAwesomeIcon></Button>
-                                    </span>
-                                </span>
-                            )
-                        })}
-
-                    </>
-                );
-        }
-    }, [preview, val])
-
-    const txt_experiencia = useRef()
-    const formPerfil = useRef()
+    const serviciosCompletos = servicios.length > 0 && servicios.every(s => s.trabajo.trim() && s.precio.trim())
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
-        const experiencia = txt_experiencia.current.value
+        if (pasos < pasosPerfil.length) return siguiente()
+        if (!serviciosCompletos) return
 
         const body = new FormData(formPerfil.current)
-        val.forEach((el, i) => {
+        servicios.forEach((el, i) => {
             body.append(`trabajo_${i}`, el["trabajo"])
             body.append(`precio_${i}`, el["precio"])
         });
         body.append(localStorage.getItem("tempRun"), selectedFile)
         body.append("experiencia", experiencia)
 
-        await fetch('https://emplifyapi.burzuam.dpdns.org/especialistas/editarPerfil', { method: 'POST', body: body, contentType: false, processData: false, })
-            .then(res => res.json().then(msg => {
-                const ReactSwal = withReactContent(Swal)
-                switch (msg["codigo"]) {
-                    case 1:
-                        ReactSwal.fire({
-                            icon: 'success',
-                            title: '¡Genial!',
-                            text: msg["msg"],
-                        }).then((result) => {
-                            if (result['isConfirmed']) {
-                                localStorage.removeItem("tempRun")
-                                ReactSwal.fire({
-                                    icon: 'warning',
-                                    title: '¡Atención!',
-                                    text: 'Por motivos de seguridad, tu registro deberá ser validado por nuestro equipo de administración. Serás notificado a través de correo electrónico una vez puedas utilizar tu cuenta.',
-                                    confirmButtonText:'Aceptar'
-                                }).then(res => {
-                                    if (res['isConfirmed']) return redirect("/")
-                                })
-                                
-                            }
-                        })
-                        break;
-                    case 2:
-                        ReactSwal.fire({
-                            icon: 'error',
-                            title: 'Problemas...',
-                            text: msg["msg"],
-                        })
-                        break;
-                    case 10:
-                        ReactSwal.fire({
-                            icon: 'error',
-                            title: 'Problemas...',
-                            text: msg["msg"],
-                        })
-                        break;
-                }
-            }))
+        setIsLoading(true)
+        try {
+            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/especialistas/editarPerfil', { method: 'POST', body: body })
+            const msg = await res.json()
+            switch (msg["codigo"]) {
+                case 1:
+                    alertSuccess(msg["msg"]).then((result) => {
+                        if (result['isConfirmed']) {
+                            localStorage.removeItem("tempRun")
+                            ReactSwal.fire({
+                                icon: 'info',
+                                title: 'Tu cuenta está en revisión',
+                                text: 'Por motivos de seguridad, tu registro deberá ser validado por nuestro equipo de administración. Te notificaremos por correo electrónico cuando puedas utilizar tu cuenta.',
+                                confirmButtonText: 'Entendido'
+                            }).then(res => {
+                                if (res['isConfirmed']) redirect("/")
+                            })
+                        }
+                    })
+                    break;
+                case 2:
+                case 10:
+                    alertError(msg["msg"])
+                    break;
+            }
+        } catch {
+            alertNetworkError()
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
-        <form className="container flex flex-col gap-4 m-auto mt-20 " encType="multipart/form-data" onSubmit={e => handleSubmit(e)} ref={formPerfil}>
-            <span className="mb-4">
-                <h1 className="text-[2.5rem] font-[500] text-center">Bienvenido a Work<span className="text-Primary">It.</span></h1>
-                <h4 className="text-[1.25rem] font-[500] text-center">¡Muestra quien eres! Dale mas detalles sobre ti al cliente</h4>
-            </span>
-
-            <div className="flex px-[5rem] md:px-[10rem] lg:px-[31rem]  flex-col gap-4">
-                <div className="grid grid-cols-1 place-items-center">
-                    {renderPasos(pasos)}
+        <AuthLayout width="lg" title="Completa tu perfil" subtitle="¡Muestra quién eres! Cuéntale a tus clientes más sobre ti.">
+            <StepIndicator steps={pasosPerfil} current={pasos} />
+            <form className="flex flex-col gap-6" encType="multipart/form-data" onSubmit={handleSubmit} ref={formPerfil}>
+                <div className={pasos == 1 ? "flex flex-col items-center gap-4 py-4" : "hidden"}>
+                    <button type="button" onClick={() => inputImage.current.click()} className="group relative rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-4" aria-label="Seleccionar foto de perfil">
+                        <Avatar src={preview} showFallback isBordered color="primary" className="h-40 w-40" fallback={<FontAwesomeIcon icon={faCamera} className="text-4xl text-default-400" />} />
+                        <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-sm font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">Cambiar foto</span>
+                    </button>
+                    <input ref={inputImage} onChange={onSelectFile} type="file" accept="image/*" className="sr-only" tabIndex={-1} />
+                    <p className="text-center text-sm text-ink-muted">Usa una foto donde se vea bien tu rostro. Formatos JPG o PNG.</p>
+                    <Button color="primary" variant="flat" startContent={<FontAwesomeIcon icon={faCamera} />} onPress={() => inputImage.current.click()}>
+                        {selectedFile ? "Elegir otra foto" : "Subir foto"}
+                    </Button>
                 </div>
-                <div className="flex justify-between">
-                    <Button color="secondary" ref={btnAtras} type="button" variant="ghost" onClick={() => handlePasos("resta")}>Atrás</Button>
-                    {
-                        (pasos == 3)
-                            ? <Button color="secondary" disabled={enableFinalizar} type="submit">Finalizar</Button>
-                            : <Button color="secondary" type="button" ref={btnSiguiente} onClick={() => handlePasos("suma")}>Siguiente</Button>
-                    }
 
+                <div className={pasos == 2 ? "block" : "hidden"}>
+                    <Textarea
+                        label="Cuéntanos un poco sobre ti"
+                        labelPlacement="outside"
+                        variant="bordered"
+                        minRows={5}
+                        placeholder="Te sugerimos orientar tu descripción en torno a tu experiencia laboral"
+                        description="Este texto aparecerá en tu perfil público."
+                        value={experiencia}
+                        onValueChange={setExperiencia}
+                    />
                 </div>
-            </div>
-        </form>
+
+                <div className={pasos == 3 ? "flex flex-col gap-3" : "hidden"}>
+                    <div className="flex items-center justify-between gap-3">
+                        <div>
+                            <p className="font-semibold text-ink">Servicios que ofreces</p>
+                            <p className="text-sm text-ink-muted">Agrega al menos un servicio con su precio.</p>
+                        </div>
+                        <Button color="primary" variant="flat" type="button" onPress={handleAdd} startContent={<FontAwesomeIcon icon={faPlus} />}>Agregar</Button>
+                    </div>
+
+                    {servicios.length == 0 && (
+                        <p className="rounded-xl border-2 border-dashed border-default-200 px-4 py-6 text-center text-sm text-ink-muted">Aún no has agregado servicios.</p>
+                    )}
+
+                    {servicios.map((data, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                            <Input
+                                aria-label={`Nombre del servicio ${i + 1}`}
+                                variant="bordered"
+                                placeholder="Nombre del servicio"
+                                onValueChange={(v) => handleChanges(v, "trabajo", i)}
+                                value={data["trabajo"]}
+                                className="flex-[2]"
+                            />
+                            <Input
+                                aria-label={`Precio del servicio ${i + 1}`}
+                                variant="bordered"
+                                placeholder="1.000.000"
+                                inputMode="numeric"
+                                startContent={<span className="text-sm text-default-400">$</span>}
+                                onValueChange={(v) => handleChanges(v, "precio", i)}
+                                value={data["precio"]}
+                                className="flex-1"
+                            />
+                            <Button color="danger" variant="light" type="button" onPress={() => handleDelete(i)} isIconOnly aria-label={`Eliminar servicio ${i + 1}`}>
+                                <FontAwesomeIcon icon={faTrash} />
+                            </Button>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex justify-between gap-3 border-t border-default-100 pt-5">
+                    <Button variant="bordered" type="button" isDisabled={pasos == 1} onPress={atras}>Atrás</Button>
+                    {pasos == pasosPerfil.length
+                        ? <Button color="primary" isDisabled={!serviciosCompletos} isLoading={isLoading} type="submit">Finalizar</Button>
+                        : <Button color="primary" type="button" onPress={siguiente}>Siguiente</Button>}
+                </div>
+            </form>
+        </AuthLayout>
     )
 }

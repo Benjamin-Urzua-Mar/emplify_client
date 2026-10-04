@@ -1,236 +1,156 @@
-import { Input, Button, } from "@nextui-org/react"
+import { Button, Avatar } from "@nextui-org/react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlass, faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons"
+import { faAngleLeft, faAngleRight, faMagnifyingGlass, faUserCheck, faHandshake, faQuoteLeft } from "@fortawesome/free-solid-svg-icons"
 import { useRef, useState } from 'react';
-import { Avatar } from "@nextui-org/react";
-import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
-import { setGlobalState } from "../../../global_states/searchResults";
+import { Link } from 'react-router-dom'
+import { SearchBar } from "../Global/SearchBar";
+import { rubros } from "../../data/rubros";
 
+const pasos = [
+  { icon: faMagnifyingGlass, titulo: "Busca", texto: "Ingresa tu comuna y el rubro que necesitas." },
+  { icon: faUserCheck, titulo: "Compara", texto: "Revisa perfiles, servicios y precios de profesionales verificados." },
+  { icon: faHandshake, titulo: "Contrata", texto: "Envía tu solicitud y coordina directamente con el especialista." },
+]
 
 export const Hero = () => {
-  const txt_comuna = useRef()
-  const txt_rubro = useRef()
-  const redirect = useNavigate()
-  const buscarEspecialista = async (e) => {
-    e.preventDefault()
-    const comuna = txt_comuna.current.value
-    const rubro = txt_rubro.current.value
+  const [rubro, setRubro] = useState(localStorage.getItem("rubro") ?? "")
+  const comunaRef = useRef()
+  const heroRef = useRef()
 
-    const body = JSON.stringify(
-      {
-        comuna: comuna,
-        rubro: rubro
-      }
-    )
-    const headers = {
-      "Content-Type": "application/json"
-    }
-
-    await fetch('https://emplifyapi.burzuam.dpdns.org/buscar', { method: 'POST', body: body, headers: headers })
-      .then(res => res.json().then(msg => {
-        const ReactSwal = withReactContent(Swal)
-        const redirectParameters = () => {
-
-          localStorage.setItem("searchResults", JSON.stringify(msg["data"]));
-          localStorage.setItem("comuna", comuna);
-          localStorage.setItem("rubro", rubro)
-        }
-        switch (msg["codigo"]) {
-          case 1:
-            redirect("/buscar", redirectParameters())
-            break;
-          case 2:
-            ReactSwal.fire({
-              icon: 'warning',
-              title: 'Vaya...',
-              text: "Por lo visto no existen profesionales del rubro solicitado dentro de tu comuna.",
-              footer: "Asegúrate de haber escrito bien tu comuna."
-            })
-            break;
-
-          case 10:
-            break;
-        }
-      }))
+  const elegirRubro = (key) => {
+    setRubro(key)
+    heroRef.current?.scrollIntoView({ behavior: "smooth" })
+    setTimeout(() => comunaRef.current?.focus(), 400)
   }
-
 
   return (
     <>
-      <section id="hero" className="text-center px-[2rem] py-80 sm:py-52 md:px-[10rem] lg:px-[17rem]  font-['Poppins', sans-serif] bg-fixed bg-[url('./assets/hero.jpg')] bg-cover relative before:content-['']  before:bg-Transparent before:absolute before:top-0 before:bottom-0 before:right-0 before:left-0">
-        <div className="relative">
-          <h1 className="text-[30px] md:text-[48px]  font-[700]">Bienvenido a Empl<span className="text-Primary">ify</span></h1>
-          <h5 className="text-[15px] md:text-[24px] text-gray-700">¡Busca al profesional que salvará tu día!</h5>
-          <form className="flex justify-center items-center flex-wrap mt-4" onSubmit={(e) => buscarEspecialista(e)}>
-            <Input
-              placeholder="Ciudad o Comuna"
-              className="p-4 w-full sm:w-3/4 md:w-4/5 lg:w-4/6 2xl:w-1/3"
-              ref={txt_comuna}
-              endContent={
-                <div className="flex items-center">
-
-                  <select
-                    className="outline-none border-0 bg-transparent text-default-400 text-small"
-                    id="currency"
-                    name="currency"
-                    ref={txt_rubro}
-                  >
-                    <option>Rubro</option>
-                    <option>Informática</option>
-                    <option>Construcción</option>
-                    <option>Electricidad</option>
-                    <option>Mecánica</option>
-                  </select>
-
-                </div>
-              }
-              type="text"
-            />
-            <Button color="secondary" type="submit" className="sm:mt-0 ">
-              <span><FontAwesomeIcon icon={faMagnifyingGlass}></FontAwesomeIcon> Buscar</span>
-            </Button>
-          </form>
-        </div>
-
-
-      </section>
-      {/* Sección de Categorías y Acciones */}
-      <div>
-        <div className="container mx-auto mt-8">
-
-          <div className="flex flex-wrap justify-center my-8">
-            <h2 className="text-2xl font-bold text-center mb-4 w-full">Nuestras Categorías</h2>
-
-            <div className="bg-gray-100  rounded-md p-4 m-2 min-w-min">
-
-
-              <div className="flex space-x-4">
-                <a href="/Gasfiter" className="text-sm  hover:underline">Gásfiter</a>
-                <a href="/Albanil" className="text-sm  hover:underline">Albañil</a>
-                <a href="/Mecanico" className="text-sm  hover:underline">Mecanico</a>
-                <a href="/Cerrajero" className="text-sm  hover:underline">Cerrajero</a>
-                <a href="/Peluquero" className="text-sm hover:underline">Peluquero</a>
-                <a href="/pintor" className="text-sm hover:underline">Pintor</a>
-                <a href="/electricista" className="text-sm hover:underline">Electricista</a>
-                <a href="/carpintero" className="text-sm hover:underline">Carpintero</a>
-                <a href="/gas" className="text-sm hover:underline">Gas</a>
-                <a href="/decorador" className="text-sm hover:underline">Decorador</a>
-                <a href="/decorador" className="text-sm hover:underline">Arquitecto</a>
-                <a href="/decorador" className="text-sm hover:underline">Informatica</a>
-                <a href="/decorador" className="text-sm hover:underline">Mudanzas</a>
-                <a href="/decorador" className="text-sm hover:underline">Mascotas</a>
-                <a href="/decorador" className="text-sm hover:underline">Jardinero</a>
-
-              </div>
-              <div className="flex justify-center mt-4">
-                <a href="#" className="text-sm text-Primary hover:underline block mt-2">Ver más</a>
-              </div>
-            </div>
+      <section
+        id="hero"
+        ref={heroRef}
+        className="relative bg-[url('./assets/hero.jpg')] bg-cover bg-center md:bg-fixed before:absolute before:inset-0 before:bg-white/75 before:content-['']"
+      >
+        <div className="page-container relative flex flex-col items-center py-20 text-center sm:py-28 lg:py-36">
+          <span className="mb-4 rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-600">Profesionales verificados</span>
+          <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
+            Bienvenido a Empl<span className="text-brand-500">ify</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-lg text-ink-body sm:text-xl">¡Busca al profesional que salvará tu día!</p>
+          <div className="mt-8 w-full max-w-3xl rounded-2xl bg-white/80 p-3 shadow-card backdrop-blur sm:p-4">
+            <SearchBar ref={comunaRef} rubro={rubro} onRubroChange={setRubro} />
           </div>
         </div>
+      </section>
 
-      </div>
-      <hr className="border-t border-gray-300 my-4" />
+      {/* Cómo funciona */}
+      <section className="page-container py-16">
+        <h2 className="text-center text-2xl font-bold sm:text-3xl">¿Cómo funciona?</h2>
+        <ol className="mt-10 grid gap-6 sm:grid-cols-3">
+          {pasos.map((paso, i) => (
+            <li key={paso.titulo} className="card flex flex-col items-center p-6 text-center">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-lg text-brand-500">
+                <FontAwesomeIcon icon={paso.icon} />
+              </span>
+              <h3 className="mt-4 text-lg font-semibold">{i + 1}. {paso.titulo}</h3>
+              <p className="mt-1 text-sm text-ink-muted">{paso.texto}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
 
-      {/* Sección WorkersHighlight */}
+      {/* Categorías */}
+      <section className="bg-surface-muted py-16">
+        <div className="page-container">
+          <h2 className="text-center text-2xl font-bold sm:text-3xl">Nuestras categorías</h2>
+          <p className="mt-2 text-center text-ink-muted">Elige un rubro y encuentra profesionales en tu comuna.</p>
+          <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {rubros.map(r => (
+              <button
+                key={r.key}
+                type="button"
+                onClick={() => elegirRubro(r.key)}
+                className="card group flex flex-col items-start gap-3 p-5 text-left transition hover:-translate-y-0.5 hover:border-brand-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+              >
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500 transition-colors group-hover:bg-brand-500 group-hover:text-white">
+                  <FontAwesomeIcon icon={r.icon} />
+                </span>
+                <span>
+                  <span className="block font-semibold text-ink">{r.label}</span>
+                  <span className="mt-0.5 block text-sm text-ink-muted">{r.descripcion}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <WorkersHighlight />
 
+      {/* CTA especialistas */}
+      <section className="page-container pb-16">
+        <div className="flex flex-col items-start justify-between gap-6 rounded-3xl bg-brand-600 px-6 py-10 text-white sm:px-10 md:flex-row md:items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-white sm:text-3xl">¿Eres profesional?</h2>
+            <p className="mt-2 max-w-lg text-white/85">Únete a Emplify, muestra tu trabajo y recibe solicitudes de clientes cerca de ti.</p>
+          </div>
+          <Button as={Link} to="/especialistas/register" size="lg" className="bg-white font-medium text-brand-600">
+            Regístrate como especialista
+          </Button>
+        </div>
+      </section>
     </>
   )
 }
 
-
+const workers = [
+  { name: "Juan Pérez", specialty: "Informática", comment: "Excelente profesional, siempre puntual.", avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026024d" },
+  { name: "María García", specialty: "Construcción", comment: "Muy detallista y meticulosa en su trabajo.", avatarUrl: "https://i.pravatar.cc/150?u=a04258114e29026702d" },
+  { name: "Lucía Barra", specialty: "Construcción", comment: "Muy detallista y meticulosa en su trabajo.", avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
+  { name: "Lucas López", specialty: "Construcción", comment: "Cumplió los plazos y dejó todo impecable.", avatarUrl: "https://i.pravatar.cc/150?u=a04258a2462d826712d" },
+  { name: "Gabriel Parra", specialty: "Fotografía", comment: "Muy profesional, lo recomiendo totalmente.", avatarUrl: "https://i.pravatar.cc/150?u=a04258114e29026708c" },
+];
 
 const WorkersHighlight = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const workers = [
-    {
-      name: "Juan Pérez",
-      specialty: "Informática",
-      comment: "Excelente profesional, siempre puntual.",
-      avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026024d"
-
-    },
-    {
-      name: "María García",
-      specialty: "Construcción",
-      comment: "Muy detallista y meticulosa en su trabajo.",
-      avatarUrl: "https://i.pravatar.cc/150?u=a04258114e29026702d"
-
-    },
-    {
-      name: "Lucia Barra",
-      specialty: "Construcción",
-      comment: "Muy detallista y meticulosa en su trabajo.",
-      avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d"
-
-    },
-    {
-      name: "Lucas López",
-      specialty: "Construcción",
-      comment: "Muy detallista y meticulosa en su trabajo.",
-      avatarUrl: "https://i.pravatar.cc/150?u=a04258a2462d826712d"
-
-    },
-    {
-      name: "Gabriel Parra",
-      specialty: "Fotógrafo",
-      comment: "Muy detallista y meticulosa en su trabajo.",
-      avatarUrl: "https://i.pravatar.cc/150?u=a04258114e29026708c"
-
-    },
-    // ... tus trabajadores ...
-  ];
-
-  const nextWorkers = () => {
-    setCurrentIndex(prevIndex => (prevIndex + 3) % workers.length);
-  }
-
-  const prevWorkers = () => {
-    setCurrentIndex(prevIndex => (prevIndex - 3 + workers.length) % workers.length);
-  }
+  const nextWorkers = () => setCurrentIndex(prev => (prev + 1) % workers.length)
+  const prevWorkers = () => setCurrentIndex(prev => (prev - 1 + workers.length) % workers.length)
 
   return (
-    <section className="mt-10 p-5">
-      <h2 className="text-2xl font-bold mb-5 text-center ">Trabajadores del Mes</h2>
-      <div className="flex justify-between items-center">
-        <Button isIconOnly radius="full" onClick={prevWorkers} color="secondary">
-          <FontAwesomeIcon icon={faAngleLeft}></FontAwesomeIcon>
-        </Button>
-        <div className="flex space-x-4">
-          {[0, 1, 2].map(offset => {
-            const workerIndex = (currentIndex + offset) % workers.length;
-            return (
-              <div key={workerIndex} className="flex items-center p-5 rounded-lg shadow-md w-1/3">
-                <div className="mr-5 flex-shrink-0">
-                  <Avatar className="w-20 h-20 text-large" src={workers[workerIndex].avatarUrl} alt={workers[workerIndex].name} size="large" />
-                </div>
-
-                <div className="flex flex-col justify-between h-full">
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">{workers[workerIndex].name} </h3>
-                    <p className="text-md mb-2"><strong>Especialidad:</strong> {workers[workerIndex].specialty}</p>
-                    <p className="text-md"><strong>Comentario:</strong> {workers[workerIndex].comment}</p>
-                  </div>
-                  <div className="text-right">
-                    <Link to="#" className="hover:underline text-Primary">Mostrar Perfil</Link>
-                  </div>
-
-                </div>
-              </div>
-            );
-          })}
+    <section className="page-container py-16" aria-roledescription="carrusel" aria-label="Profesionales destacados">
+      <div className="mb-8 flex items-end justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold sm:text-3xl">Profesionales destacados</h2>
+          <p className="mt-1 text-ink-muted">Lo que dicen los clientes de nuestros especialistas.</p>
         </div>
-        <Button isIconOnly radius="full" onClick={nextWorkers} color="secondary" >
-          <FontAwesomeIcon icon={faAngleRight}></FontAwesomeIcon>
-        </Button>
+        <div className="flex gap-2">
+          <Button isIconOnly radius="full" variant="bordered" onPress={prevWorkers} aria-label="Anterior">
+            <FontAwesomeIcon icon={faAngleLeft} />
+          </Button>
+          <Button isIconOnly radius="full" color="primary" onPress={nextWorkers} aria-label="Siguiente">
+            <FontAwesomeIcon icon={faAngleRight} />
+          </Button>
+        </div>
+      </div>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {[0, 1, 2].map(offset => {
+          const worker = workers[(currentIndex + offset) % workers.length];
+          return (
+            <figure key={worker.name} className={`card flex-col gap-4 p-6 ${offset == 0 ? "flex" : offset == 1 ? "hidden md:flex" : "hidden lg:flex"}`}>
+              <FontAwesomeIcon icon={faQuoteLeft} className="text-2xl text-brand-200" />
+              <blockquote className="flex-1 text-ink-body">{worker.comment}</blockquote>
+              <figcaption className="flex items-center gap-3">
+                <Avatar src={worker.avatarUrl} name={worker.name} size="lg" />
+                <span>
+                  <span className="block font-semibold text-ink">{worker.name}</span>
+                  <span className="block text-sm text-ink-muted">{worker.specialty}</span>
+                </span>
+              </figcaption>
+            </figure>
+          );
+        })}
       </div>
     </section>
   );
 }
 
 export default Hero;
-
-
