@@ -4,6 +4,7 @@ import { setGlobalState } from "../../../global_states/index"
 import { Logo } from "../ui/Logo"
 import { PasswordInput } from "../ui/PasswordInput"
 import { alertError, alertNetworkError, toast } from "../../lib/alerts"
+import { apiUrl } from "../../lib/config"
 
 export const AdminLogin = () => {
     const [user, setUser] = useState("")
@@ -14,7 +15,7 @@ export const AdminLogin = () => {
         e.preventDefault()
         setIsLoading(true)
         try {
-            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/admin/login', {
+            const res = await fetch(apiUrl("/admin/login"), {
                 method: 'POST',
                 body: JSON.stringify({ user, contrasena }),
                 headers: { "Content-Type": "application/json" }

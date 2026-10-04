@@ -8,6 +8,7 @@ import { SocialAuthButtons } from "../ui/SocialAuthButtons";
 import { DatosPersonalesFields } from "../Global/DatosPersonalesFields";
 import { validarDatosPersonales, datosPersonalesIniciales, nombresUbicacion } from "../Global/validaciones";
 import { alertError, alertNetworkError, alertSuccess } from "../../lib/alerts";
+import { apiUrl } from "../../lib/config"
 
 const beneficios = [
     "Ofrecerte una experiencia personalizada dentro de Emplify.",
@@ -50,7 +51,7 @@ export const RegisterCliente = () => {
 
         setIsLoading(true)
         try {
-            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/clientes/register', { method: 'POST', body: body, headers: { "Content-Type": "application/json" } })
+            const res = await fetch(apiUrl("/clientes/register"), { method: 'POST', body: body, headers: { "Content-Type": "application/json" } })
             const msg = await res.json()
             switch (msg["codigo"]) {
                 case 1:

@@ -5,6 +5,7 @@ import { SectionCard } from "../ui/SectionCard";
 import { PageHeader } from "../ui/PageHeader";
 import { navCliente } from "../../data/navegacion";
 import { ReactSwal, alertError, alertInfo, alertNetworkError, alertSuccess, toast } from "../../lib/alerts";
+import { apiUrl } from "../../lib/config"
 
 const soloTelefono = (valor) => String(valor ?? "").replace(/\D/g, "").slice(-8)
 
@@ -30,7 +31,7 @@ export const ConfiguracionCliente = () => {
 
         setIsSaving(true)
         try {
-            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/clientes/editarCuenta', { method: "POST", body: body, headers: { "Content-Type": "application/json" } })
+            const res = await fetch(apiUrl("/clientes/editarCuenta"), { method: "POST", body: body, headers: { "Content-Type": "application/json" } })
             const msg = await res.json()
             switch (msg["codigo"]) {
                 case 1:
@@ -88,7 +89,7 @@ export const ConfiguracionCliente = () => {
 
     useEffect(() => {
         const body = JSON.stringify({ _id: localStorage.getItem("user_id") })
-        fetch('https://emplifyapi.burzuam.dpdns.org/clientes/getCuenta', { method: "POST", body: body, headers: { "Content-Type": "application/json" } })
+        fetch(apiUrl("/clientes/getCuenta"), { method: "POST", body: body, headers: { "Content-Type": "application/json" } })
             .then(res => res.json().then(msg => {
                 switch (msg["codigo"]) {
                     case 1:

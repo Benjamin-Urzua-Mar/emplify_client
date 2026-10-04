@@ -10,6 +10,7 @@ import { DatosPersonalesFields } from "../Global/DatosPersonalesFields";
 import { validarDatosPersonales, datosPersonalesIniciales, nombresUbicacion } from "../Global/validaciones";
 import { rubros } from "../../data/rubros";
 import { alertError, alertNetworkError, alertSuccess } from "../../lib/alerts";
+import { apiUrl } from "../../lib/config"
 
 const documentos = [
     { icon: faIdCard, label: "Copia de cédula de identidad" },
@@ -68,7 +69,7 @@ export const RegisterEspecialista = () => {
 
         setIsLoading(true)
         try {
-            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/especialistas/register', { method: 'POST', body: body })
+            const res = await fetch(apiUrl("/especialistas/register"), { method: 'POST', body: body })
             const msg = await res.json()
             switch (msg["codigo"]) {
                 case 1:

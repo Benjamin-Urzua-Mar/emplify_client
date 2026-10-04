@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { AuthLayout } from "../ui/AuthLayout"
 import { StepIndicator } from "../ui/StepIndicator"
 import { ReactSwal, alertError, alertNetworkError, alertSuccess } from "../../lib/alerts"
+import { apiUrl } from "../../lib/config"
 
 const pasosPerfil = ["Foto", "Sobre ti", "Servicios"]
 
@@ -61,7 +62,7 @@ export const PerfilInicial = () => {
 
         setIsLoading(true)
         try {
-            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/especialistas/editarPerfil', { method: 'POST', body: body })
+            const res = await fetch(apiUrl("/especialistas/editarPerfil"), { method: 'POST', body: body })
             const msg = await res.json()
             switch (msg["codigo"]) {
                 case 1:

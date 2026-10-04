@@ -12,6 +12,7 @@ import { EmptyState } from '../ui/EmptyState';
 import { Rating } from '../ui/Rating';
 import { alertError, alertNetworkError, confirmDialog, toast } from '../../lib/alerts';
 import { formatPrecio, hoyISO, imageUrl } from '../../lib/format';
+import { apiUrl } from "../../lib/config"
 
 const condiciones = [
     "El cliente debe proporcionar toda la información y recursos necesarios para la realización del servicio contratado.",
@@ -73,7 +74,7 @@ export const PerfilEspecialista = ({ socket }) => {
 
         setIsSending(true)
         try {
-            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/clientes/solicitarTrabajo', { method: 'POST', body: body, headers: { "Content-Type": "application/json" } })
+            const res = await fetch(apiUrl("/clientes/solicitarTrabajo"), { method: 'POST', body: body, headers: { "Content-Type": "application/json" } })
             const msg = await res.json()
             onClose()
             switch (msg["codigo"]) {

@@ -8,10 +8,11 @@ import { EmptyState } from "../ui/EmptyState"
 import { navEspecialista } from "../../data/navegacion"
 import { alertError, alertNetworkError, confirmDialog, toast } from "../../lib/alerts"
 import { formatFecha } from "../../lib/format"
+import { apiUrl } from "../../lib/config"
 
-const API = 'https://emplifyapi.burzuam.dpdns.org/especialistas'
+const API = "/especialistas"
 
-const post = (ruta, data) => fetch(`${API}/${ruta}`, {
+const post = (ruta, data) => fetch(apiUrl(`${API}/${ruta}`), {
     method: 'POST',
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" }

@@ -6,6 +6,7 @@ import { AuthLayout } from "../ui/AuthLayout"
 import { PasswordInput } from "../ui/PasswordInput"
 import { SocialAuthButtons } from "../ui/SocialAuthButtons"
 import { alertError, alertNetworkError, toast } from "../../lib/alerts"
+import { apiUrl } from "../../lib/config"
 
 /**
  * Formulario de inicio de sesión compartido por clientes y especialistas.
@@ -22,7 +23,7 @@ export const LoginForm = ({ tipo, subtitle }) => {
         e.preventDefault()
         setIsLoading(true)
         try {
-            const res = await fetch(`https://emplifyapi.burzuam.dpdns.org/${tipo}/login`, {
+            const res = await fetch(apiUrl(`/${tipo}/login`), {
                 method: 'POST',
                 body: JSON.stringify({ email, contrasena }),
                 headers: { "Content-Type": "application/json" }

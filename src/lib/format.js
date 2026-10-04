@@ -1,7 +1,7 @@
-export const API_IMAGES_URL = "https://emplifyapi.burzuam.dpdns.org/resources/images"
+import { imagenesUrl } from "./config"
 
 /** URL pública de una imagen subida al servidor. */
-export const imageUrl = (fileName) => (fileName ? `${API_IMAGES_URL}/${fileName}` : undefined)
+export const imageUrl = (fileName) => (fileName ? `${imagenesUrl()}/${fileName}` : undefined)
 
 /** Convierte "$ 1.000.000", "1000000" o 1000000 en número. */
 export const parsePrecio = (valor) => {
