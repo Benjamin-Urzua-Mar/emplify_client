@@ -1,9 +1,16 @@
-import { faLaptopCode, faHelmetSafety, faBolt, faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons"
+import { faLaptopCode, faHelmetSafety, faBolt, faScrewdriverWrench, faFan, faFaucetDrip, faToolbox } from "@fortawesome/free-solid-svg-icons"
 
-/* Rubros disponibles en la plataforma (búsqueda, registro y filtros) */
-export const rubros = [
-    { key: "Informática", label: "Informática", icon: faLaptopCode, descripcion: "Soporte, redes y desarrollo" },
-    { key: "Construcción", label: "Construcción", icon: faHelmetSafety, descripcion: "Albañilería, pintura y remodelaciones" },
-    { key: "Electricidad", label: "Electricidad", icon: faBolt, descripcion: "Instalaciones y reparaciones eléctricas" },
-    { key: "Mecánica", label: "Mecánica", icon: faScrewdriverWrench, descripcion: "Mantención y reparación de vehículos" },
-]
+/*
+ * Íconos por rubro. La lista de rubros viene del endpoint /rubros del backend;
+ * aquí solo se asocia un ícono por nombre (con uno genérico de respaldo).
+ */
+const iconos = {
+    "informática": faLaptopCode,
+    "construcción": faHelmetSafety,
+    "electricidad": faBolt,
+    "mecánica": faScrewdriverWrench,
+    "climatización": faFan,
+    "gasfitería": faFaucetDrip,
+}
+
+export const iconoRubro = (nombre = "") => iconos[nombre.toLowerCase()] ?? faToolbox

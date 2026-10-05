@@ -11,7 +11,8 @@ Esta guía documenta el lenguaje visual de **Emplify** y las reglas para constru
 | `src/components/ui/` | Componentes del design system (layouts y piezas reutilizables) |
 | `src/lib/alerts.js` | Alertas, toasts y confirmaciones estandarizadas |
 | `src/lib/format.js` | Formato de precios, fechas, imágenes e iniciales |
-| `src/data/` | Datos compartidos: `rubros`, `contacto`, `navegacion`, `regiones` |
+| `src/lib/catalogos.js` | Hook `useCatalogo` para cargar catálogos del backend (`/comunas`, `/rubros`) |
+| `src/data/` | Datos compartidos: íconos de rubros, `contacto`, `navegacion`, `regiones` |
 
 ---
 
@@ -178,6 +179,8 @@ Reglas:
   - `<UbicacionFields>` — Región → Provincia → Comuna encadenados.
   - `<DatosPersonalesFields>` — bloque completo de datos personales para registros.
 - Filtros y ordenamiento: `Select size="sm" variant="bordered"` (no uses un `Input` dentro de un `Dropdown`).
+- **Listas largas con búsqueda** (equivalente a select2): `Autocomplete` de NextUI, con `defaultItems`, `selectedKey`, `isLoading` y `listboxProps={{ emptyContent }}`. Úsalo cuando haya más de ~15 opciones (p. ej. comunas). Para pocas opciones usa `Select`.
+- **Opciones desde el backend:** carga los catálogos con `useCatalogo("comunas" | "rubros")`. Muestra un placeholder "Cargando…" con `isLoading` y, si falla, `isInvalid` + un mensaje con la acción "Reintentar". Usa el `_id` como `key` y el `nombre` como `textValue`.
 
 ### 7.3 Chips de estado
 
@@ -201,7 +204,7 @@ Reglas:
 | `StepIndicator` | Formularios por pasos (registro de especialista, perfil inicial) |
 | `Rating` | Estrellas de solo lectura o seleccionables (`onChange`) |
 | `SocialAuthButtons` | Acceso con Google/Facebook |
-| `SearchBar` (`Global/`) | Buscador comuna + rubro (home y resultados) |
+| `SearchBar` (`Global/`) | Buscador comuna (`Autocomplete`) + rubro (`Select`), ambos cargados desde el backend |
 | `LoginForm` (`Global/`) | Formulario de login de clientes y especialistas |
 
 ### 7.6 Tablas
@@ -258,7 +261,7 @@ Desde `src/lib/format.js`:
 | `imageUrl(foto)` | URL pública de una imagen del servidor |
 | `hoyISO()` | `aaaa-mm-dd` (para `min` en inputs de fecha) |
 
-Datos de contacto: siempre desde `src/data/contacto.js`. Rubros: siempre desde `src/data/rubros.js`.
+Datos de contacto: siempre desde `src/data/contacto.js`. Comunas y rubros: siempre desde el backend con `useCatalogo` (los íconos de cada rubro están en `src/data/rubros.js`, con `iconoRubro(nombre)`). Para mostrar referencias pobladas (`{ _id, nombre }`) usa `nombreDe(valor)`.
 
 ---
 
