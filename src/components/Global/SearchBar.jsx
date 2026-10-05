@@ -104,7 +104,8 @@ export const SearchBar = forwardRef(function SearchBar({ rubro, onRubroChange, s
             <Select
                 aria-label="Rubro"
                 placeholder={rubros.isLoading ? "Cargando rubros…" : "Rubro"}
-                size={"md"}
+                size={size}
+                labelPlacement="outside" // sin label: evita la altura extra de la variante "inside" y calza con el Autocomplete
                 variant="bordered"
                 classNames={{ trigger: "bg-white" }}
                 items={rubros.items}
