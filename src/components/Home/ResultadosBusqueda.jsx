@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { EmptyState } from "../ui/EmptyState"
 import { formatPrecio, imageUrl, parsePrecio } from "../../lib/format"
+import { nombreDe } from "../../lib/catalogos"
 
 const opcionesOrden = [
     { key: "relevancia", label: "Más relevantes" },
@@ -82,7 +83,7 @@ export const ResultadosBusqueda = () => {
 
             <section className="border-b border-default-100 bg-white">
                 <div className="page-container py-4">
-                    <SearchBar size="md" defaultComuna={comuna ?? ""} />
+                    <SearchBar size="md" />
                 </div>
             </section>
 
@@ -143,7 +144,7 @@ export const ResultadosBusqueda = () => {
                                         </div>
                                         {especialista.perfil?.experiencia && <p className="line-clamp-2 text-sm text-ink-body">{especialista.perfil.experiencia}</p>}
                                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-muted">
-                                            <span><FontAwesomeIcon className="mr-1.5" icon={faLocationDot} />{especialista.comuna?.nombre ?? especialista.comuna}</span>
+                                            <span><FontAwesomeIcon className="mr-1.5" icon={faLocationDot} />{nombreDe(especialista.comuna)}</span>
                                             {especialista.perfil?.antiguedad !== undefined && (
                                                 <span><FontAwesomeIcon className="mr-1.5" icon={faBriefcase} />{especialista.perfil.antiguedad} años en Emplify</span>
                                             )}
