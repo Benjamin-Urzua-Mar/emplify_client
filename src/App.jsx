@@ -17,6 +17,7 @@ import { io } from "socket.io-client"
 import { SolicitudesTrabajo } from "./components/Especialistas/SolicitudesTrabajo"
 import { EditarPerfil } from "./components/Especialistas/EditarPerfil"
 import { socketUrl } from "./lib/config"
+import { GuiaDemo } from "./components/Demo/GuiaDemo"
 
 const App = () => {
   // Una sola conexión de socket para toda la sesión
@@ -41,6 +42,7 @@ const App = () => {
         <Route path="/clientes/historialTrabajos" element={<HistorialTrabajos />} />
         <Route path="/buscar" element={<ResultadosBusqueda />} />
         <Route path="/buscar/perfilEspecialista" element={<PerfilEspecialista socket={socket} />} />
+        <Route path="/demo" element={<GuiaDemo />} />
         <Route path="/error" element={<NotFoundPage />} />
         <Route path="/editarperfil" element={<EditarPerfil />} />
         <Route path="/sesionexpirada" element={<SesionExpirada />} />
