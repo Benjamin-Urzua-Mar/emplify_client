@@ -8,7 +8,7 @@ import { StepIndicator } from "../ui/StepIndicator";
 import { FileField } from "../ui/FileField";
 import { DatosPersonalesFields } from "../Global/DatosPersonalesFields";
 import { validarDatosPersonales, datosPersonalesIniciales, nombresUbicacion } from "../Global/validaciones";
-import { rubros } from "../../data/rubros";
+import { useCatalogo } from "../../lib/catalogos";
 import { alertError, alertNetworkError, alertSuccess } from "../../lib/alerts";
 import { apiUrl } from "../../lib/config"
 
@@ -24,6 +24,7 @@ export const RegisterEspecialista = () => {
     const [errores, setErrores] = useState({})
     const [isLoading, setIsLoading] = useState(false)
     const formRegister = useRef()
+    const rubros = useCatalogo("rubros")
     const redirect = useNavigate()
 
     const setCampo = (campo, valor) => {
@@ -129,14 +130,16 @@ export const RegisterEspecialista = () => {
                         variant="bordered"
                         labelPlacement="outside"
                         label="Rubro"
-                        placeholder="Selecciona tu rubro"
+                        placeholder={rubros.isLoading ? "Cargando rubros…" : "Selecciona tu rubro"}
+                        items={rubros.items}
+                        isLoading={rubros.isLoading}
                         isRequired
                         selectedKeys={form.rubro ? [form.rubro] : []}
                         onSelectionChange={(keys) => setCampo("rubro", Array.from(keys)[0] ?? "")}
-                        isInvalid={!!errores.rubro}
-                        errorMessage={errores.rubro}
+                        isInvalid={!!errores.rubro || !!rubros.error}
+                        errorMessage={rubros.error ? "No pudimos cargar los rubros. Recarga la página." : errores.rubro}
                     >
-                        {rubros.map(r => <SelectItem key={r.key} value={r.key}>{r.label}</SelectItem>)}
+                        {(r) => <SelectItem key={r.nombre} textValue={r.nombre}>{r.nombre}</SelectItem>}
                     </Select>
                     <Input
                         variant="bordered"

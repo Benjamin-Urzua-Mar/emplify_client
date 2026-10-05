@@ -13,6 +13,7 @@ import { Rating } from '../ui/Rating';
 import { alertError, alertNetworkError, confirmDialog, toast } from '../../lib/alerts';
 import { formatPrecio, hoyISO, imageUrl } from '../../lib/format';
 import { apiUrl } from "../../lib/config"
+import { nombreDe } from '../../lib/catalogos';
 
 const condiciones = [
     "El cliente debe proporcionar toda la información y recursos necesarios para la realización del servicio contratado.",
@@ -138,7 +139,7 @@ export const PerfilEspecialista = ({ socket }) => {
                             <p className="text-ink-muted">{especialista.profesion}</p>
                             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-ink-muted">
                                 <Rating value={4.8} count={50} />
-                                {especialista.comuna && <span><FontAwesomeIcon className="mr-1.5" icon={faLocationDot} />{especialista.comuna?.nombre ?? especialista.comuna}</span>}
+                                {especialista.comuna && <span><FontAwesomeIcon className="mr-1.5" icon={faLocationDot} />{nombreDe(especialista.comuna)}</span>}
                                 {especialista.disponibilidad && <Chip size="sm" variant="flat" color={especialista.disponibilidad == "Disponible" ? "success" : "default"}>{especialista.disponibilidad}</Chip>}
                             </div>
                         </div>

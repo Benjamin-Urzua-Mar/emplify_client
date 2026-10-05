@@ -1,10 +1,11 @@
-import { Button, Avatar } from "@nextui-org/react"
+import { Button, Avatar, Skeleton } from "@nextui-org/react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleLeft, faAngleRight, faMagnifyingGlass, faUserCheck, faHandshake, faQuoteLeft } from "@fortawesome/free-solid-svg-icons"
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom'
 import { SearchBar } from "../Global/SearchBar";
-import { rubros } from "../../data/rubros";
+import { iconoRubro } from "../../data/rubros";
+import { useCatalogo } from "../../lib/catalogos";
 
 const pasos = [
   { icon: faMagnifyingGlass, titulo: "Busca", texto: "Ingresa tu comuna y el rubro que necesitas." },
@@ -13,7 +14,8 @@ const pasos = [
 ]
 
 export const Hero = () => {
-  const [rubro, setRubro] = useState(localStorage.getItem("rubro") ?? "")
+  const [rubro, setRubro] = useState(localStorage.getItem("rubroId") ?? "")
+  const rubros = useCatalogo("rubros")
   const comunaRef = useRef()
   const heroRef = useRef()
 
@@ -63,20 +65,26 @@ export const Hero = () => {
         <div className="page-container">
           <h2 className="text-center text-2xl font-bold sm:text-3xl">Nuestras categorías</h2>
           <p className="mt-2 text-center text-ink-muted">Elige un rubro y encuentra profesionales en tu comuna.</p>
-          <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {rubros.map(r => (
+          <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-3">
+            {rubros.error && (
+              <p className="col-span-full text-center text-sm text-ink-muted">
+                No pudimos cargar las categorías. <button type="button" className="link" onClick={rubros.reintentar}>Reintentar</button>
+              </p>
+            )}
+            {rubros.isLoading && [1, 2, 3, 4].map(n => <Skeleton key={n} className="h-36 rounded-2xl" />)}
+            {rubros.items.map(r => (
               <button
-                key={r.key}
+                key={r._id}
                 type="button"
-                onClick={() => elegirRubro(r.key)}
+                onClick={() => elegirRubro(r._id)}
                 className="card group flex flex-col items-start gap-3 p-5 text-left transition hover:-translate-y-0.5 hover:border-brand-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               >
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500 transition-colors group-hover:bg-brand-500 group-hover:text-white">
-                  <FontAwesomeIcon icon={r.icon} />
+                  <FontAwesomeIcon icon={iconoRubro(r.nombre)} />
                 </span>
                 <span>
-                  <span className="block font-semibold text-ink">{r.label}</span>
-                  <span className="mt-0.5 block text-sm text-ink-muted">{r.descripcion}</span>
+                  <span className="block font-semibold text-ink">{r.nombre}</span>
+                  {r.descripcion && <span className="mt-0.5 block text-sm text-ink-muted">{r.descripcion}</span>}
                 </span>
               </button>
             ))}
