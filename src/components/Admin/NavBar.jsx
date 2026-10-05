@@ -6,6 +6,7 @@ import { useGlobalState, setGlobalState } from "../../../global_states"
 import { useState } from "react"
 import { Logo } from "../ui/Logo"
 import { alertError, alertNetworkError, toast } from "../../lib/alerts"
+import { apiUrl } from "../../lib/config"
 
 const secciones = [
     { key: "cliente", label: "Clientes" },
@@ -26,7 +27,7 @@ export const NavBar = () => {
 
     const logout = async () => {
         try {
-            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/admin/logout', { method: 'POST' })
+            const res = await fetch(apiUrl("/admin/logout"), { method: 'POST' })
             const msg = await res.json()
             switch (msg["codigo"]) {
                 case 1:

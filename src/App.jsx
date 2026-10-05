@@ -16,10 +16,11 @@ import { useMemo } from "react"
 import { io } from "socket.io-client"
 import { SolicitudesTrabajo } from "./components/Especialistas/SolicitudesTrabajo"
 import { EditarPerfil } from "./components/Especialistas/EditarPerfil"
+import { socketUrl } from "./lib/config"
 
 const App = () => {
   // Una sola conexión de socket para toda la sesión
-  const socket = useMemo(() => io("https://emplifyapi.burzuam.dpdns.org", {
+  const socket = useMemo(() => io(socketUrl(), {
     auth: {
       _id: localStorage.getItem("user_id")
     }

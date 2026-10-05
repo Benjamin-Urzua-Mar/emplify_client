@@ -6,13 +6,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { alertError, alertNetworkError, confirmDialog, toast } from "../../lib/alerts";
 import { formatFecha, imageUrl } from "../../lib/format";
 import { PageHeader } from "../ui/PageHeader";
+import { apiUrl } from "../../lib/config"
 
-const API = "https://emplifyapi.burzuam.dpdns.org/admin"
+const API = "/admin"
 const FILAS_POR_PAGINA = 10
 
 const colorPlan = { Premium: "primary", Corriente: "default" }
 
-const post = (ruta, data) => fetch(`${API}/${ruta}`, {
+const post = (ruta, data) => fetch(apiUrl(`${API}/${ruta}`), {
   method: "POST",
   body: JSON.stringify(data),
   headers: { "Content-Type": "application/json" }
@@ -36,7 +37,7 @@ export const AdminUsuarios = ({ config }) => {
 
   const recargar = useCallback(() => {
     setIsLoading(true)
-    fetch(`${API}/${endpoints.listar}`)
+    fetch(apiUrl(`${API}/${endpoints.listar}`))
       .then(res => res.json().then(msg => {
         switch (msg["codigo"]) {
           case 1:

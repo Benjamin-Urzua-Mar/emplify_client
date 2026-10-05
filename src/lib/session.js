@@ -1,4 +1,5 @@
 import { alertError, alertNetworkError, toast } from "./alerts"
+import { apiUrl } from "./config"
 
 /** Datos de la sesión guardados en localStorage. */
 export const getSession = () => ({
@@ -14,7 +15,7 @@ export const isLoggedIn = () => localStorage.getItem("userName") !== null
 export const logout = async (navigate) => {
     const tipo = localStorage.getItem("tipoUsuario") == "Cliente" ? "clientes" : "especialistas"
     try {
-        const res = await fetch(`https://emplifyapi.burzuam.dpdns.org/${tipo}/logout`, { method: "POST" })
+        const res = await fetch(apiUrl(`/${tipo}/logout`), { method: "POST" })
         const msg = await res.json()
         switch (msg["codigo"]) {
             case 1:

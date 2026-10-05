@@ -6,6 +6,7 @@ import { faMagnifyingGlass, faLocationDot } from "@fortawesome/free-solid-svg-ic
 import { useNavigate } from "react-router-dom"
 import { rubros } from "../../data/rubros"
 import { alertError, alertNetworkError, alertWarning } from "../../lib/alerts"
+import { apiUrl } from "../../lib/config"
 
 /**
  * Buscador de especialistas por comuna y rubro.
@@ -32,7 +33,7 @@ export const SearchBar = forwardRef(function SearchBar({ rubro, onRubroChange, d
 
         setIsLoading(true)
         try {
-            const res = await fetch('https://emplifyapi.burzuam.dpdns.org/buscar', {
+            const res = await fetch(apiUrl("/buscar"), {
                 method: 'POST',
                 body: JSON.stringify({ comuna: comuna.trim(), rubro: rubroActual }),
                 headers: { "Content-Type": "application/json" }
